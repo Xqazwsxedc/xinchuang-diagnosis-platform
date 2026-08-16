@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1480" viewBox="0 0 1920 1480">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect width="40" height="40" fill="#f6f8fc"/><path d="M40 0H0V40" fill="none" stroke="#e8edf5"/>
+    </pattern>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#a9b6c9" flood-opacity=".2"/></filter>
+    <marker id="blue" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto"><path d="M0 0L10 5.5 0 11Z" fill="#5b8fd9"/></marker>
+    <marker id="slate" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto"><path d="M0 0L10 5.5 0 11Z" fill="#64748b"/></marker>
+    <style>
+      text{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;letter-spacing:0}
+      .title{font-size:44px;font-weight:800;fill:#111827}.subtitle{font-size:20px;fill:#526174}.band{font-size:28px;font-weight:800;fill:#172033}.stage{font-size:22px;font-weight:800;fill:#172033}.body{font-size:13px;fill:#536174}.step{font-size:14px;fill:#334155}.tiny{font-size:12px;fill:#64748b}.tech{font-size:12px;font-weight:700;fill:#475569}.tag{font-size:13px;font-weight:700;fill:#245aa2}.number{font-family:Arial,sans-serif;font-size:16px;font-weight:700;fill:white}.check{font-size:12px;font-weight:700;fill:#1f5d9f}
+    </style>
+  </defs>
+  <rect width="1920" height="1480" fill="url(#grid)"/>
+  <text x="960" y="82" class="title" text-anchor="middle">信创数据库智能故障诊断及修复平台</text>
+  <text x="960" y="119" class="subtitle" text-anchor="middle">Vibe Coding Harness 项目工作流图（五步详细拆解）</text>
+  <line x1="180" y1="143" x2="1740" y2="143" stroke="#9eb7dc" stroke-width="2"/>
+  <g filter="url(#shadow)"><rect x="590" y="170" width="740" height="95" rx="22" fill="#fff" stroke="#9db3d0" stroke-width="2"/></g>
+  <path d="M635 207h24l8 9h43v35a7 7 0 0 1-7 7h-68a7 7 0 0 1-7-7v-37a7 7 0 0 1 7-7z" fill="#ffd36a" stroke="#9b6a19" stroke-width="2"/>
+  <text x="735" y="214" class="band">项目根目录 springboot work/</text><text x="735" y="244" class="subtitle">需求、代码、测试、部署与 AI 协作上下文统一管理</text>
+  <path d="M960 266V316" stroke="#5b8fd9" stroke-width="4" marker-end="url(#blue)"/>
+  <g filter="url(#shadow)"><rect x="80" y="320" width="1760" height="1030" rx="25" fill="#fbfcff" stroke="#a8bbd4" stroke-width="2.5"/></g>
+  <path d="M128 360h31l10 11h54v32a8 8 0 0 1-8 8h-79a8 8 0 0 1-8-8v-35a8 8 0 0 1 8-8z" fill="#ffd36a" stroke="#9b6a19" stroke-width="2"/>
+  <text x="245" y="396" class="band">企业级 Vibe Coding Harness 闭环</text><text x="245" y="426" class="subtitle">五个阶段逐步推进；每一步都拆出流程、检查点和产出</text>
+
+  <path d="M383 690H442M700 690H759M1017 690H1076M1334 690H1393" stroke="#5b8fd9" stroke-width="4" marker-end="url(#blue)"/>
+
+  <g filter="url(#shadow)"><rect x="116" y="472" width="267" height="458" rx="18" fill="#fffdf8" stroke="#d1a642" stroke-width="2.5"/><rect x="116" y="472" width="267" height="68" rx="18" fill="#fff1c8"/></g>
+  <circle cx="150" cy="506" r="17" fill="#d69c1f"/><text x="150" y="512" class="number" text-anchor="middle">1</text><text x="181" y="513" class="stage">需求与约束</text>
+  <text x="144" y="575" class="body">① 接收用户需求、原型与现状截图</text><text x="144" y="611" class="body">② 对齐 PROJECT_SPEC 和数据库说明</text><text x="144" y="647" class="body">③ 核对权限、接口、数据边界</text><text x="144" y="683" class="body">④ 固化验收清单和回滚边界</text>
+  <text x="144" y="706" class="tech">技术栈：Markdown / Figma</text><text x="144" y="724" class="tech">数据库设计文档</text><rect x="141" y="742" width="206" height="40" rx="10" fill="#fff6dd" stroke="#ecd49a"/><text x="244" y="767" class="tag" text-anchor="middle">先确认再开工</text><text x="144" y="805" class="tiny">输入：需求 / 原型 / 规范</text><text x="144" y="838" class="check">检查：范围清楚、风险可追溯</text><text x="144" y="878" class="tiny">产出：确认单、约束表、验收口径</text>
+
+  <g filter="url(#shadow)"><rect x="433" y="472" width="267" height="458" rx="18" fill="#fbf9ff" stroke="#a986cf" stroke-width="2.5"/><rect x="433" y="472" width="267" height="68" rx="18" fill="#eee3ff"/></g>
+  <circle cx="467" cy="506" r="17" fill="#8756b7"/><text x="467" y="512" class="number" text-anchor="middle">2</text><text x="498" y="513" class="stage">Harness 规划</text>
+  <text x="461" y="575" class="body">① PM 拆分范围、风险和优先级</text><text x="461" y="611" class="body">② 后端确认表结构、接口和权限</text><text x="461" y="647" class="body">③ 前端确认页面、交互和状态</text><text x="461" y="683" class="body">④ 测试/部署确定验证顺序与回滚点</text>
+  <text x="461" y="706" class="tech">技术栈：Codex / .ai-context</text><text x="461" y="724" class="tech">Git / PROJECT_SPEC.md</text><rect x="458" y="742" width="206" height="40" rx="10" fill="#f4edff" stroke="#d5b9f4"/><text x="561" y="767" class="tag" text-anchor="middle">形成执行计划</text><text x="461" y="805" class="tiny">输入：确认单 + 角色上下文</text><text x="461" y="838" class="check">检查：计划、分工、回退点齐全</text><text x="461" y="878" class="tiny">产出：任务拆解、验证顺序、回写清单</text>
+
+  <g filter="url(#shadow)"><rect x="750" y="472" width="267" height="458" rx="18" fill="#f7fcfb" stroke="#2a9a86" stroke-width="2.5"/><rect x="750" y="472" width="267" height="68" rx="18" fill="#d9f4ed"/></g>
+  <circle cx="784" cy="506" r="17" fill="#168b77"/><text x="784" y="512" class="number" text-anchor="middle">3</text><text x="815" y="513" class="stage">分层实现</text>
+  <text x="778" y="575" class="body">① 先改数据库与初始化数据</text><text x="778" y="611" class="body">② 再做 DTO、Service、Controller</text><text x="778" y="647" class="body">③ 补权限、校验、审计和日志</text><text x="778" y="683" class="body">④ 最后落前端页面、路由和联调</text>
+  <text x="778" y="706" class="tech">技术栈：Spring Boot / MyBatis</text><text x="778" y="724" class="tech">MySQL / Vue 3 / TypeScript</text><rect x="775" y="742" width="206" height="40" rx="10" fill="#e8f8f3" stroke="#a8ddcf"/><text x="878" y="767" class="tag" text-anchor="middle">落地真实代码链路</text><text x="778" y="805" class="tiny">输入：计划 / 契约 / 数据规范</text><text x="778" y="838" class="check">检查：分层清晰、接口兼容、权限完整</text><text x="778" y="878" class="tiny">产出：后端 + 前端可运行功能</text>
+
+  <g filter="url(#shadow)"><rect x="1067" y="472" width="267" height="458" rx="18" fill="#f8fbff" stroke="#5288c4" stroke-width="2.5"/><rect x="1067" y="472" width="267" height="68" rx="18" fill="#dcecff"/></g>
+  <circle cx="1101" cy="506" r="17" fill="#3977bd"/><text x="1101" y="512" class="number" text-anchor="middle">4</text><text x="1132" y="513" class="stage">测试与质量</text>
+  <text x="1095" y="575" class="body">① 先跑 JUnit 白盒与边界用例</text><text x="1095" y="611" class="body">② 再跑接口黑盒与权限回归</text><text x="1095" y="647" class="body">③ 页面联调、构建、视觉回归</text><text x="1095" y="683" class="body">④ SonarQube 扫描后修复再验证</text>
+  <text x="1095" y="706" class="tech">技术栈：JUnit / Mockito / JaCoCo</text><text x="1095" y="724" class="tech">Playwright / SonarQube</text><rect x="1092" y="742" width="206" height="40" rx="10" fill="#eaf3ff" stroke="#b4d1f3"/><text x="1195" y="767" class="tag" text-anchor="middle">执行质量门禁</text><text x="1095" y="805" class="tiny">输入：代码、用例、环境</text><text x="1095" y="838" class="check">检查：编译、覆盖率、接口、扫描</text><text x="1095" y="878" class="tiny">产出：测试报告、问题清单、修复记录</text>
+
+  <g filter="url(#shadow)"><rect x="1384" y="472" width="340" height="458" rx="18" fill="#fffafb" stroke="#c87966" stroke-width="2.5"/><rect x="1384" y="472" width="340" height="68" rx="18" fill="#ffe4dd"/></g>
+  <circle cx="1418" cy="506" r="17" fill="#b95e49"/><text x="1418" y="512" class="number" text-anchor="middle">5</text><text x="1449" y="513" class="stage">构建与本机部署</text>
+  <text x="1412" y="575" class="body">① 打包后端 Jar 和前端静态资源</text><text x="1412" y="611" class="body">② 配置 MySQL、Nginx 和环境变量</text><text x="1412" y="647" class="body">③ 启动 Spring Boot 与数据库链路</text><text x="1412" y="683" class="body">④ 浏览器访问并做健康检查</text>
+  <text x="1412" y="706" class="tech">技术栈：Maven / Spring Boot Jar</text><text x="1412" y="724" class="tech">Nginx / MySQL / PowerShell</text><rect x="1409" y="742" width="289" height="40" rx="10" fill="#fff0ec" stroke="#efc0b5"/><text x="1553" y="767" class="tag" text-anchor="middle">交付可访问版本</text><text x="1412" y="805" class="tiny">输入：通过质量门禁的代码</text><text x="1412" y="838" class="check">检查：页面、API、数据库链路正常</text><text x="1412" y="878" class="tiny">产出：浏览器 → Nginx → API → MySQL</text>
+
+  <path d="M1554 965v55H561v-55" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#slate)"/>
+  <g filter="url(#shadow)"><rect x="415" y="1018" width="1140" height="112" rx="20" fill="#fff" stroke="#9db3d0" stroke-width="2"/></g>
+  <path d="M460 1052h22l7 8h37v26a6 6 0 0 1-6 6h-60a6 6 0 0 1-6-6v-28a6 6 0 0 1 6-6z" fill="#ffd36a" stroke="#9b6a19" stroke-width="2"/>
+  <text x="555" y="1062" class="stage">文档收口与下一轮迭代</text><text x="555" y="1093" class="body">更新 PROJECT_SPEC.md、docs/、.ai-context/，清理过时内容并记录验证结论。</text><text x="555" y="1118" class="tiny">若验证失败：回到对应阶段修复，重新验证后才能进入下一轮需求。</text>
+  <g filter="url(#shadow)"><rect x="215" y="1190" width="1490" height="92" rx="18" fill="#fff" stroke="#a8bbd4" stroke-width="2"/></g>
+  <text x="270" y="1245" class="band">工作闭环</text><text x="492" y="1245" class="subtitle">需求输入 → 角色协作 → 分层实现 → 自动化测试 → 本机部署 → 证据回写 → 持续迭代</text>
+</svg>

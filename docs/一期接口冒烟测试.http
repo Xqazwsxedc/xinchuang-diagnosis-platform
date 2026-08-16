@@ -1,0 +1,131 @@
+@baseUrl = http://localhost:8080/api
+@username = admin
+@password = password
+@token =
+
+### 1. 健康检查
+GET {{baseUrl}}/health
+
+### 2. 登录，复制响应中的 token 到上方 @token
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+### 3. 当前登录用户
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### 4. 数据台账：业务系统列表
+GET {{baseUrl}}/ledger/business-systems?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 5. 数据台账：分布式数据库列表
+GET {{baseUrl}}/ledger/db-resources?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 6. 数据大屏：概览
+GET {{baseUrl}}/dashboard/overview
+Authorization: Bearer {{token}}
+
+### 7. 数据大屏：状态分布
+GET {{baseUrl}}/dashboard/status-distribution
+Authorization: Bearer {{token}}
+
+### 8. 数据大屏：近 24 小时趋势
+GET {{baseUrl}}/dashboard/trend
+Authorization: Bearer {{token}}
+
+### 9. 数据大屏：告警列表
+GET {{baseUrl}}/dashboard/alerts
+Authorization: Bearer {{token}}
+
+### 10. 通知中心：未读数量
+GET {{baseUrl}}/notifications/unread-count
+Authorization: Bearer {{token}}
+
+### 11. 通知中心：列表
+GET {{baseUrl}}/notifications?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 12. 用户管理：用户列表
+GET {{baseUrl}}/system/users?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 13. 角色管理：角色列表
+GET {{baseUrl}}/system/roles?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 14. 菜单权限：菜单树
+GET {{baseUrl}}/system/menus/tree
+Authorization: Bearer {{token}}
+
+### 15. 登录日志
+GET {{baseUrl}}/system/logs/login?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 16. 操作日志
+GET {{baseUrl}}/system/logs/operation?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 17. 字典类型列表
+GET {{baseUrl}}/system/dict/types?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 18. 系统配置列表
+GET {{baseUrl}}/system/configs?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 19. AI 模型列表
+GET {{baseUrl}}/ai/models?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 20. AI 故障知识库
+GET {{baseUrl}}/ai/knowledge?pageNo=1&pageSize=10&knowledgeType=FAULT
+Authorization: Bearer {{token}}
+
+### 21. AI 缺陷知识库
+GET {{baseUrl}}/ai/knowledge?pageNo=1&pageSize=10&knowledgeType=DEFECT
+Authorization: Bearer {{token}}
+
+### 22. AI 优化知识库
+GET {{baseUrl}}/ai/knowledge?pageNo=1&pageSize=10&knowledgeType=OPTIMIZATION
+Authorization: Bearer {{token}}
+
+### 23. AI 故障预测任务
+GET {{baseUrl}}/ai/tasks?pageNo=1&pageSize=10&taskType=FAULT_PREDICTION
+Authorization: Bearer {{token}}
+
+### 24. AI 缺陷检测任务
+GET {{baseUrl}}/ai/tasks?pageNo=1&pageSize=10&taskType=DEFECT_DETECTION
+Authorization: Bearer {{token}}
+
+### 25. AI 性能优化任务
+GET {{baseUrl}}/ai/tasks?pageNo=1&pageSize=10&taskType=PERFORMANCE_OPTIMIZATION
+Authorization: Bearer {{token}}
+
+### 26. AI 任务执行记录
+GET {{baseUrl}}/ai/tasks/executions?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 27. 故障预测结果
+GET {{baseUrl}}/ai/fault-reports?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 28. 缺陷检测结果
+GET {{baseUrl}}/ai/defect-reports?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 29. 性能优化建议
+GET {{baseUrl}}/ai/optimization-reports?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 30. 未登录访问业务接口，应返回 401
+GET {{baseUrl}}/dashboard/overview
+
+### 31. 退出登录
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{token}}

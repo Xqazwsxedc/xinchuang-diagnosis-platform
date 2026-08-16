@@ -1,0 +1,43 @@
+package com.xinchuang.diagnosis.security;
+
+import java.util.Collections;
+import java.util.List;
+
+public class LoginUser {
+    private Long userId;
+    private String username;
+    private String realName;
+    private List<String> roles = Collections.emptyList();
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
+}

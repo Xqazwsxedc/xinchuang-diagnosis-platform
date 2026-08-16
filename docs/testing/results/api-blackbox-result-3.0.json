@@ -1,0 +1,642 @@
+{
+  "status": "PASSED",
+  "version": "3.0",
+  "startedAt": "2026-08-13T14:41:05.7435341+08:00",
+  "finishedAt": "2026-08-13T14:41:08.4825731+08:00",
+  "total": 63,
+  "passed": 63,
+  "failed": 0,
+  "error": "",
+  "cases": [
+    {
+      "id": "BB30-BASE-01",
+      "name": "健康检查",
+      "method": "GET",
+      "path": "/health",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:05.7435341+08:00"
+    },
+    {
+      "id": "BB30-BASE-02",
+      "name": "匿名访问仪表盘被拒绝",
+      "method": "GET",
+      "path": "/dashboard/overview",
+      "expectedStatus": 401,
+      "actualStatus": 401,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:05.7669917+08:00"
+    },
+    {
+      "id": "BB30-BASE-03",
+      "name": "匿名访问个人信息被拒绝",
+      "method": "GET",
+      "path": "/auth/me",
+      "expectedStatus": 401,
+      "actualStatus": 401,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:05.7729821+08:00"
+    },
+    {
+      "id": "BB30-AUTH-admin",
+      "name": "admin 登录",
+      "method": "POST",
+      "path": "/auth/login",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:06.0778387+08:00"
+    },
+    {
+      "id": "BB30-AUTH-operator",
+      "name": "operator 登录",
+      "method": "POST",
+      "path": "/auth/login",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:06.2640338+08:00"
+    },
+    {
+      "id": "BB30-AUTH-viewer",
+      "name": "viewer 登录",
+      "method": "POST",
+      "path": "/auth/login",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:06.4224861+08:00"
+    },
+    {
+      "id": "BB30-AUTH-04",
+      "name": "管理员当前用户信息",
+      "method": "GET",
+      "path": "/auth/me",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:06.5687357+08:00"
+    },
+    {
+      "id": "BB30-AUTH-05",
+      "name": "管理员个人中心资料",
+      "method": "GET",
+      "path": "/auth/profile",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:06.5952836+08:00"
+    },
+    {
+      "id": "BB30-SYS-01",
+      "name": "仪表盘概览",
+      "method": "GET",
+      "path": "/dashboard/overview",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:06.6600147+08:00"
+    },
+    {
+      "id": "BB30-SYS-02",
+      "name": "用户列表",
+      "method": "GET",
+      "path": "/system/users?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:06.7784046+08:00"
+    },
+    {
+      "id": "BB30-SYS-03",
+      "name": "角色列表",
+      "method": "GET",
+      "path": "/system/roles?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:06.8054089+08:00"
+    },
+    {
+      "id": "BB30-SYS-04",
+      "name": "菜单树",
+      "method": "GET",
+      "path": "/system/menus/tree",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:06.8420355+08:00"
+    },
+    {
+      "id": "BB30-SYS-05",
+      "name": "系统配置列表",
+      "method": "GET",
+      "path": "/system/configs?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:06.8925911+08:00"
+    },
+    {
+      "id": "BB30-SYS-06",
+      "name": "字典类型列表",
+      "method": "GET",
+      "path": "/system/dict/types?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:06.9214043+08:00"
+    },
+    {
+      "id": "BB30-SYS-07",
+      "name": "字典项列表",
+      "method": "GET",
+      "path": "/system/dict/items?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:06.9526470+08:00"
+    },
+    {
+      "id": "BB30-SYS-08",
+      "name": "登录日志",
+      "method": "GET",
+      "path": "/system/logs/login?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:06.9869176+08:00"
+    },
+    {
+      "id": "BB30-SYS-09",
+      "name": "操作日志",
+      "method": "GET",
+      "path": "/system/logs/operation?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.0185885+08:00"
+    },
+    {
+      "id": "BB30-SYS-10",
+      "name": "安全登录日志",
+      "method": "GET",
+      "path": "/system/security/login-logs?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.0477524+08:00"
+    },
+    {
+      "id": "BB30-SYS-11",
+      "name": "通知列表",
+      "method": "GET",
+      "path": "/notifications?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.0782613+08:00"
+    },
+    {
+      "id": "BB30-SYS-12",
+      "name": "未读通知数",
+      "method": "GET",
+      "path": "/notifications/unread-count",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.0977234+08:00"
+    },
+    {
+      "id": "BB30-LEDGER-01",
+      "name": "业务系统列表",
+      "method": "GET",
+      "path": "/ledger/business-systems?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.1380498+08:00"
+    },
+    {
+      "id": "BB30-LEDGER-02",
+      "name": "分布式数据库列表",
+      "method": "GET",
+      "path": "/ledger/db-resources?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.1607236+08:00"
+    },
+    {
+      "id": "BB30-LEDGER-03",
+      "name": "业务系统名称筛选",
+      "method": "GET",
+      "path": "/ledger/business-systems?pageNo=1&pageSize=10&name=%E8%B4%A2%E5%8A%A1",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.2122572+08:00"
+    },
+    {
+      "id": "BB30-LEDGER-04",
+      "name": "数据库负责人筛选",
+      "method": "GET",
+      "path": "/ledger/db-resources?pageNo=1&pageSize=10&ownerName=%E7%AE%A1%E7%90%86%E5%91%98",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.2362583+08:00"
+    },
+    {
+      "id": "BB30-LEDGER-05",
+      "name": "业务系统详情",
+      "method": "GET",
+      "path": "/ledger/business-systems/1900000000000000102",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.2790750+08:00"
+    },
+    {
+      "id": "BB30-LEDGER-06",
+      "name": "业务数据记录",
+      "method": "GET",
+      "path": "/ledger/business-systems/1900000000000000102/data-records",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.3030023+08:00"
+    },
+    {
+      "id": "BB30-LEDGER-07",
+      "name": "数据库详情",
+      "method": "GET",
+      "path": "/ledger/db-resources/1900000000000000001",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.3212838+08:00"
+    },
+    {
+      "id": "BB30-LEDGER-08",
+      "name": "数据库一日指标",
+      "method": "GET",
+      "path": "/ledger/db-resources/1900000000000000001/metrics?range=1D",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.3463764+08:00"
+    },
+    {
+      "id": "BB30-LEDGER-09",
+      "name": "数据库一日日志",
+      "method": "GET",
+      "path": "/ledger/db-resources/1900000000000000001/logs?range=1D&pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.3736360+08:00"
+    },
+    {
+      "id": "BB30-LEDGER-10",
+      "name": "非法指标时间范围被拒绝",
+      "method": "GET",
+      "path": "/ledger/db-resources/1900000000000000001/metrics?range=30D",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.3938019+08:00"
+    },
+    {
+      "id": "BB30-AI-01",
+      "name": "AI 总览",
+      "method": "GET",
+      "path": "/ai/overview",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.4141068+08:00"
+    },
+    {
+      "id": "BB30-AI-02",
+      "name": "模型管理列表",
+      "method": "GET",
+      "path": "/ai/models?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.4466954+08:00"
+    },
+    {
+      "id": "BB30-AI-03",
+      "name": "故障知识库隔离查询",
+      "method": "GET",
+      "path": "/ai/knowledge?knowledgeType=FAULT&pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.4864481+08:00"
+    },
+    {
+      "id": "BB30-AI-04",
+      "name": "缺陷知识库隔离查询",
+      "method": "GET",
+      "path": "/ai/knowledge?knowledgeType=DEFECT&pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.5094481+08:00"
+    },
+    {
+      "id": "BB30-AI-05",
+      "name": "优化知识库隔离查询",
+      "method": "GET",
+      "path": "/ai/knowledge?knowledgeType=OPTIMIZATION&pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.5312388+08:00"
+    },
+    {
+      "id": "BB30-AI-06",
+      "name": "通用任务列表",
+      "method": "GET",
+      "path": "/ai/tasks?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.5548422+08:00"
+    },
+    {
+      "id": "BB30-AI-07",
+      "name": "故障预测任务列表",
+      "method": "GET",
+      "path": "/ai/fault-prediction/tasks?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.5875304+08:00"
+    },
+    {
+      "id": "BB30-AI-08",
+      "name": "故障智能预警列表",
+      "method": "GET",
+      "path": "/ai/fault-prediction/alerts?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.6179487+08:00"
+    },
+    {
+      "id": "BB30-AI-09",
+      "name": "缺陷检测任务列表",
+      "method": "GET",
+      "path": "/ai/tasks?pageNo=1&pageSize=10&taskType=DEFECT_DETECTION",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.6366415+08:00"
+    },
+    {
+      "id": "BB30-AI-10",
+      "name": "性能优化任务列表",
+      "method": "GET",
+      "path": "/ai/tasks?pageNo=1&pageSize=10&taskType=PERFORMANCE_OPTIMIZATION",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.6565001+08:00"
+    },
+    {
+      "id": "BB30-AI-11",
+      "name": "缺陷检测报表列表",
+      "method": "GET",
+      "path": "/ai/defect-reports?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.6788559+08:00"
+    },
+    {
+      "id": "BB30-AI-12",
+      "name": "性能优化建议列表",
+      "method": "GET",
+      "path": "/ai/optimization-reports?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.7022312+08:00"
+    },
+    {
+      "id": "BB30-AI-13",
+      "name": "故障报表兼容列表",
+      "method": "GET",
+      "path": "/ai/fault-reports?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.7224271+08:00"
+    },
+    {
+      "id": "BB30-AI-14",
+      "name": "任务执行记录列表",
+      "method": "GET",
+      "path": "/ai/tasks/executions?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.7442749+08:00"
+    },
+    {
+      "id": "BB30-AI-15",
+      "name": "非法任务创建日期被拒绝",
+      "method": "GET",
+      "path": "/ai/tasks?pageNo=1&pageSize=10&createdDate=2026-99-99",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.7598727+08:00"
+    },
+    {
+      "id": "BB30-AI-16",
+      "name": "非法预警状态被拒绝",
+      "method": "GET",
+      "path": "/ai/fault-prediction/alerts?pageNo=1&pageSize=10&processStatus=UNKNOWN",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.7734867+08:00"
+    },
+    {
+      "id": "BB30-AI-17",
+      "name": "缺陷报表详情前置列表",
+      "method": "GET",
+      "path": "/ai/defect-reports?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.7936359+08:00"
+    },
+    {
+      "id": "BB30-AI-18",
+      "name": "优化建议详情前置列表",
+      "method": "GET",
+      "path": "/ai/optimization-reports?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.8211945+08:00"
+    },
+    {
+      "id": "BB30-AI-19",
+      "name": "故障任务详情前置列表",
+      "method": "GET",
+      "path": "/ai/fault-prediction/tasks?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.8430481+08:00"
+    },
+    {
+      "id": "BB30-AI-20",
+      "name": "缺陷报表详情",
+      "method": "GET",
+      "path": "/ai/defect-reports/1900000000000003501",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.8607537+08:00"
+    },
+    {
+      "id": "BB30-AI-21",
+      "name": "性能优化建议详情",
+      "method": "GET",
+      "path": "/ai/optimization-reports/1900000000000003601",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.8777100+08:00"
+    },
+    {
+      "id": "BB30-AI-22",
+      "name": "故障任务配置详情",
+      "method": "GET",
+      "path": "/ai/fault-prediction/tasks/1900000000000003201",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.9044101+08:00"
+    },
+    {
+      "id": "BB30-PERM-01",
+      "name": "查看者台账列表",
+      "method": "GET",
+      "path": "/ledger/business-systems?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:07.9642903+08:00"
+    },
+    {
+      "id": "BB30-PERM-02",
+      "name": "查看者故障知识库",
+      "method": "GET",
+      "path": "/ai/knowledge?knowledgeType=FAULT&pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:08.0178088+08:00"
+    },
+    {
+      "id": "BB30-PERM-03",
+      "name": "查看者缺陷报表",
+      "method": "GET",
+      "path": "/ai/defect-reports?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:08.0668197+08:00"
+    },
+    {
+      "id": "BB30-PERM-04",
+      "name": "查看者性能优化建议",
+      "method": "GET",
+      "path": "/ai/optimization-reports?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:08.1196507+08:00"
+    },
+    {
+      "id": "BB30-PERM-05",
+      "name": "查看者不能新增用户",
+      "method": "POST",
+      "path": "/system/users",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:08.1661564+08:00"
+    },
+    {
+      "id": "BB30-PERM-06",
+      "name": "查看者不能新增业务系统",
+      "method": "POST",
+      "path": "/ledger/business-systems",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:08.2120420+08:00"
+    },
+    {
+      "id": "BB30-PERM-07",
+      "name": "查看者不能新增故障任务",
+      "method": "POST",
+      "path": "/ai/fault-prediction/tasks",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:08.2556112+08:00"
+    },
+    {
+      "id": "BB30-PERM-08",
+      "name": "查看者不能处理预警",
+      "method": "PATCH",
+      "path": "/ai/fault-prediction/alerts/1/handle",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:08.2977863+08:00"
+    },
+    {
+      "id": "BB30-PERM-09",
+      "name": "操作员不能删除故障任务",
+      "method": "DELETE",
+      "path": "/ai/fault-prediction/tasks/1",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:08.3465638+08:00"
+    },
+    {
+      "id": "BB30-PERM-10",
+      "name": "操作员不能删除缺陷报表",
+      "method": "DELETE",
+      "path": "/ai/defect-reports/1",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:08.3962878+08:00"
+    },
+    {
+      "id": "BB30-PERM-11",
+      "name": "操作员不能删除优化建议",
+      "method": "DELETE",
+      "path": "/ai/optimization-reports/1",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-13T14:41:08.4498625+08:00"
+    }
+  ]
+}

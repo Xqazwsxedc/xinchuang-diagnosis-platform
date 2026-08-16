@@ -1,0 +1,641 @@
+{
+  "status": "PASSED",
+  "version": "2.1",
+  "startedAt": "2026-08-11T01:19:59.9490945+08:00",
+  "finishedAt": "2026-08-11T01:20:01.7172355+08:00",
+  "total": 68,
+  "passed": 68,
+  "failed": 0,
+  "cases": [
+    {
+      "name": "Health check",
+      "method": "GET",
+      "path": "/health",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:19:59.9490945+08:00"
+    },
+    {
+      "name": "Unauthenticated dashboard is rejected",
+      "method": "GET",
+      "path": "/dashboard/overview",
+      "expectedStatus": 401,
+      "actualStatus": 401,
+      "passed": true,
+      "executedAt": "2026-08-11T01:19:59.9688031+08:00"
+    },
+    {
+      "name": "Unauthenticated current-user is rejected",
+      "method": "GET",
+      "path": "/auth/me",
+      "expectedStatus": 401,
+      "actualStatus": 401,
+      "passed": true,
+      "executedAt": "2026-08-11T01:19:59.9758533+08:00"
+    },
+    {
+      "name": "admin login",
+      "method": "POST",
+      "path": "/auth/login",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.111478+08:00"
+    },
+    {
+      "name": "Admin current-user data",
+      "method": "GET",
+      "path": "/auth/me",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.1721233+08:00"
+    },
+    {
+      "name": "Admin dashboard",
+      "method": "GET",
+      "path": "/dashboard/overview",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.2164777+08:00"
+    },
+    {
+      "name": "Admin users",
+      "method": "GET",
+      "path": "/system/users?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.229587+08:00"
+    },
+    {
+      "name": "Admin roles",
+      "method": "GET",
+      "path": "/system/roles?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.2392805+08:00"
+    },
+    {
+      "name": "Admin security logs",
+      "method": "GET",
+      "path": "/system/security/login-logs?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.2515197+08:00"
+    },
+    {
+      "name": "Admin config list",
+      "method": "GET",
+      "path": "/system/configs?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.2635452+08:00"
+    },
+    {
+      "name": "Admin dictionary types",
+      "method": "GET",
+      "path": "/system/dict/types?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.2756136+08:00"
+    },
+    {
+      "name": "Admin menu tree",
+      "method": "GET",
+      "path": "/system/menus/tree",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.3044235+08:00"
+    },
+    {
+      "name": "Admin login logs",
+      "method": "GET",
+      "path": "/system/logs/login?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.3173417+08:00"
+    },
+    {
+      "name": "Admin operation logs",
+      "method": "GET",
+      "path": "/system/logs/operation?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.3323578+08:00"
+    },
+    {
+      "name": "Admin notifications",
+      "method": "GET",
+      "path": "/notifications?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.3427839+08:00"
+    },
+    {
+      "name": "Admin unread count",
+      "method": "GET",
+      "path": "/notifications/unread-count",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.3503047+08:00"
+    },
+    {
+      "name": "AI overview",
+      "method": "GET",
+      "path": "/ai/overview",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.3591151+08:00"
+    },
+    {
+      "name": "AI models",
+      "method": "GET",
+      "path": "/ai/models?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.3688394+08:00"
+    },
+    {
+      "name": "AI knowledge",
+      "method": "GET",
+      "path": "/ai/knowledge?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.3785863+08:00"
+    },
+    {
+      "name": "AI tasks",
+      "method": "GET",
+      "path": "/ai/tasks?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.3897725+08:00"
+    },
+    {
+      "name": "AI fault reports",
+      "method": "GET",
+      "path": "/ai/fault-reports?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.4015306+08:00"
+    },
+    {
+      "name": "AI defect reports",
+      "method": "GET",
+      "path": "/ai/defect-reports?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.4154138+08:00"
+    },
+    {
+      "name": "AI optimization reports",
+      "method": "GET",
+      "path": "/ai/optimization-reports?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.4284482+08:00"
+    },
+    {
+      "name": "Admin business-system list",
+      "method": "GET",
+      "path": "/ledger/business-systems?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.4410888+08:00"
+    },
+    {
+      "name": "Admin database-resource list",
+      "method": "GET",
+      "path": "/ledger/db-resources?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.4509715+08:00"
+    },
+    {
+      "name": "Business-system detail",
+      "method": "GET",
+      "path": "/ledger/business-systems/1900000000000000102",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.4640197+08:00"
+    },
+    {
+      "name": "Business data records",
+      "method": "GET",
+      "path": "/ledger/business-systems/1900000000000000102/data-records",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.4733574+08:00"
+    },
+    {
+      "name": "Database-resource detail",
+      "method": "GET",
+      "path": "/ledger/db-resources/1900000000000000001",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.4811882+08:00"
+    },
+    {
+      "name": "Database metrics 1D",
+      "method": "GET",
+      "path": "/ledger/db-resources/1900000000000000001/metrics?range=1D",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.4972352+08:00"
+    },
+    {
+      "name": "Database logs 1D",
+      "method": "GET",
+      "path": "/ledger/db-resources/1900000000000000001/logs?range=1D&pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.5121924+08:00"
+    },
+    {
+      "name": "Invalid metric range rejected",
+      "method": "GET",
+      "path": "/ledger/db-resources/1900000000000000001/metrics?range=30D",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.5242256+08:00"
+    },
+    {
+      "name": "Invalid log level rejected",
+      "method": "GET",
+      "path": "/ledger/db-resources/1900000000000000001/logs?range=1D&logLevel=DEBUG",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.535093+08:00"
+    },
+    {
+      "name": "Invalid business-system save rejected",
+      "method": "POST",
+      "path": "/ledger/business-systems",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.562553+08:00"
+    },
+    {
+      "name": "Invalid database-resource save rejected",
+      "method": "POST",
+      "path": "/ledger/db-resources",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.57293+08:00"
+    },
+    {
+      "name": "viewer login",
+      "method": "POST",
+      "path": "/auth/login",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.6760251+08:00"
+    },
+    {
+      "name": "Viewer dashboard",
+      "method": "GET",
+      "path": "/dashboard/overview",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.7027826+08:00"
+    },
+    {
+      "name": "Viewer business-system list",
+      "method": "GET",
+      "path": "/ledger/business-systems?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.7275664+08:00"
+    },
+    {
+      "name": "Viewer database-resource list",
+      "method": "GET",
+      "path": "/ledger/db-resources?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.7494694+08:00"
+    },
+    {
+      "name": "Viewer business detail",
+      "method": "GET",
+      "path": "/ledger/business-systems/1900000000000000102",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.7722148+08:00"
+    },
+    {
+      "name": "Viewer database metrics",
+      "method": "GET",
+      "path": "/ledger/db-resources/1900000000000000001/metrics?range=1D",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.7950505+08:00"
+    },
+    {
+      "name": "Viewer database logs",
+      "method": "GET",
+      "path": "/ledger/db-resources/1900000000000000001/logs?range=1D&pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.8162676+08:00"
+    },
+    {
+      "name": "Viewer cannot create business system",
+      "method": "POST",
+      "path": "/ledger/business-systems",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.8350255+08:00"
+    },
+    {
+      "name": "Viewer cannot create database resource",
+      "method": "POST",
+      "path": "/ledger/db-resources",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.8572605+08:00"
+    },
+    {
+      "name": "Viewer cannot view users",
+      "method": "GET",
+      "path": "/system/users?pageNo=1&pageSize=10",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.8786908+08:00"
+    },
+    {
+      "name": "Viewer cannot view roles",
+      "method": "GET",
+      "path": "/system/roles?pageNo=1&pageSize=10",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.9007448+08:00"
+    },
+    {
+      "name": "Viewer cannot view system config",
+      "method": "GET",
+      "path": "/system/configs?pageNo=1&pageSize=10",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:00.9235394+08:00"
+    },
+    {
+      "name": "operator login",
+      "method": "POST",
+      "path": "/auth/login",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.02545+08:00"
+    },
+    {
+      "name": "Operator business-system list",
+      "method": "GET",
+      "path": "/ledger/business-systems?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.0536183+08:00"
+    },
+    {
+      "name": "Operator cannot view users",
+      "method": "GET",
+      "path": "/system/users?pageNo=1&pageSize=10",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.0780636+08:00"
+    },
+    {
+      "name": "Operator cannot view roles",
+      "method": "GET",
+      "path": "/system/roles?pageNo=1&pageSize=10",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.102097+08:00"
+    },
+    {
+      "id": "BB21-AUTH-admin",
+      "name": "admin 登录",
+      "method": "POST",
+      "path": "/auth/login",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.2731756+08:00"
+    },
+    {
+      "id": "BB21-AUTH-viewer",
+      "name": "viewer 登录",
+      "method": "POST",
+      "path": "/auth/login",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.3740944+08:00"
+    },
+    {
+      "id": "BB21-AUTH-operator",
+      "name": "operator 登录",
+      "method": "POST",
+      "path": "/auth/login",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.4797085+08:00"
+    },
+    {
+      "id": "BB21-SYS-01",
+      "name": "Admin notification page",
+      "method": "GET",
+      "path": "/notifications?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.4920825+08:00"
+    },
+    {
+      "id": "BB21-SYS-02",
+      "name": "Admin unread notification count",
+      "method": "GET",
+      "path": "/notifications/unread-count",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.5016506+08:00"
+    },
+    {
+      "id": "BB21-AI-01",
+      "name": "Admin dedicated fault-task page",
+      "method": "GET",
+      "path": "/ai/fault-prediction/tasks?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.5130965+08:00"
+    },
+    {
+      "id": "BB21-AI-02",
+      "name": "Invalid fault-task create date rejected",
+      "method": "GET",
+      "path": "/ai/fault-prediction/tasks?pageNo=1&pageSize=10&createdDate=2026-99-99",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.5230810+08:00"
+    },
+    {
+      "id": "BB21-AI-03",
+      "name": "Admin dedicated fault-alert page",
+      "method": "GET",
+      "path": "/ai/fault-prediction/alerts?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.5363858+08:00"
+    },
+    {
+      "id": "BB21-AI-04",
+      "name": "Invalid fault-alert status rejected",
+      "method": "GET",
+      "path": "/ai/fault-prediction/alerts?pageNo=1&pageSize=10&processStatus=UNKNOWN",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.5445868+08:00"
+    },
+    {
+      "id": "BB21-AI-05",
+      "name": "Admin fault knowledge page",
+      "method": "GET",
+      "path": "/ai/knowledge?knowledgeType=FAULT&pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.5557201+08:00"
+    },
+    {
+      "id": "BB21-LEDGER-01",
+      "name": "Business-system name filter",
+      "method": "GET",
+      "path": "/ledger/business-systems?pageNo=1&pageSize=10&name=%E8%B4%A2%E5%8A%A1",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.5715629+08:00"
+    },
+    {
+      "id": "BB21-LEDGER-02",
+      "name": "Database owner filter",
+      "method": "GET",
+      "path": "/ledger/db-resources?pageNo=1&pageSize=10&ownerName=%E7%AE%A1%E7%90%86%E5%91%98",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.5822582+08:00"
+    },
+    {
+      "id": "BB21-VIEW-01",
+      "name": "Viewer cannot create business system",
+      "method": "POST",
+      "path": "/ledger/business-systems",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.6054403+08:00"
+    },
+    {
+      "id": "BB21-VIEW-02",
+      "name": "Viewer cannot create database resource",
+      "method": "POST",
+      "path": "/ledger/db-resources",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.6267689+08:00"
+    },
+    {
+      "id": "BB21-VIEW-03",
+      "name": "Viewer cannot create fault task",
+      "method": "POST",
+      "path": "/ai/fault-prediction/tasks",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.6484876+08:00"
+    },
+    {
+      "id": "BB21-VIEW-04",
+      "name": "Viewer cannot handle fault alert",
+      "method": "PATCH",
+      "path": "/ai/fault-prediction/alerts/1/handle",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.6686518+08:00"
+    },
+    {
+      "id": "BB21-OPER-01",
+      "name": "Operator cannot delete fault task",
+      "method": "DELETE",
+      "path": "/ai/fault-prediction/tasks/1",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.6937137+08:00"
+    },
+    {
+      "id": "BB21-OPER-02",
+      "name": "Operator cannot delete fault alert",
+      "method": "DELETE",
+      "path": "/ai/fault-prediction/alerts/1",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-11T01:20:01.7157976+08:00"
+    }
+  ]
+}

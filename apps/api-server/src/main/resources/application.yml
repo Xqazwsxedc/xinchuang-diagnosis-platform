@@ -1,0 +1,65 @@
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: diagnosis-platform
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:xc_diagnosis}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD}
+    hikari:
+      initialization-fail-timeout: 0
+      maximum-pool-size: 10
+      minimum-idle: 2
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: assign_id
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+logging:
+  level:
+    com.xinchuang.diagnosis: info
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+security:
+  bootstrap-admin:
+    enabled: ${BOOTSTRAP_ADMIN_ENABLED:false}
+    username: ${BOOTSTRAP_ADMIN_USERNAME:admin}
+    password: ${BOOTSTRAP_ADMIN_PASSWORD:}
+  jwt:
+    secret: ${JWT_SECRET:}
+    expire-seconds: ${JWT_EXPIRE_SECONDS:7200}
+
+storage:
+  knowledge:
+    local-root: ${KNOWLEDGE_STORAGE_ROOT:./data/knowledge-files}
+
+monitoring:
+  prometheus:
+    base-url: ${MONITORING_PROMETHEUS_BASE_URL:}
+    connect-timeout: ${MONITORING_PROMETHEUS_CONNECT_TIMEOUT:3s}
+    read-timeout: ${MONITORING_PROMETHEUS_READ_TIMEOUT:8s}
+  targets:
+    node-instance: ${MONITORING_TARGETS_NODE_INSTANCE:}
+    mysql-instance: ${MONITORING_TARGETS_MYSQL_INSTANCE:}

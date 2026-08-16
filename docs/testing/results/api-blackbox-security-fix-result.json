@@ -1,0 +1,136 @@
+{
+  "status": "PASSED",
+  "startedAt": "2026-08-02T22:59:38.2850904+08:00",
+  "finishedAt": "2026-08-02T22:59:39.9156514+08:00",
+  "total": 14,
+  "passed": 14,
+  "failed": 0,
+  "cases": [
+    {
+      "name": "Health check",
+      "method": "GET",
+      "path": "/health",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-02T22:59:38.2850904+08:00"
+    },
+    {
+      "name": "Unauthenticated dashboard request is rejected",
+      "method": "GET",
+      "path": "/dashboard/overview",
+      "expectedStatus": 401,
+      "actualStatus": 401,
+      "passed": true,
+      "executedAt": "2026-08-02T22:59:38.3202360+08:00"
+    },
+    {
+      "name": "admin login",
+      "method": "POST",
+      "path": "/auth/login",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-02T22:59:38.7096758+08:00"
+    },
+    {
+      "name": "Admin current-user data",
+      "method": "GET",
+      "path": "/auth/me",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-02T22:59:38.8895088+08:00"
+    },
+    {
+      "name": "Admin user list",
+      "method": "GET",
+      "path": "/system/users?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-02T22:59:39.0596151+08:00"
+    },
+    {
+      "name": "Admin role list",
+      "method": "GET",
+      "path": "/system/roles?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-02T22:59:39.0931499+08:00"
+    },
+    {
+      "name": "Admin security login-log list",
+      "method": "GET",
+      "path": "/system/security/login-logs?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-02T22:59:39.1376628+08:00"
+    },
+    {
+      "name": "Admin business-system ledger list",
+      "method": "GET",
+      "path": "/ledger/business-systems?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-02T22:59:39.1997632+08:00"
+    },
+    {
+      "name": "viewer login",
+      "method": "POST",
+      "path": "/auth/login",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-02T22:59:39.3979958+08:00"
+    },
+    {
+      "name": "Viewer business-system ledger list",
+      "method": "GET",
+      "path": "/ledger/business-systems?pageNo=1&pageSize=10",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-02T22:59:39.4735965+08:00"
+    },
+    {
+      "name": "Viewer cannot create business system",
+      "method": "POST",
+      "path": "/ledger/business-systems",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-02T22:59:39.5296702+08:00"
+    },
+    {
+      "name": "Viewer cannot view user management",
+      "method": "GET",
+      "path": "/system/users?pageNo=1&pageSize=10",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-02T22:59:39.5905520+08:00"
+    },
+    {
+      "name": "operator login",
+      "method": "POST",
+      "path": "/auth/login",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": true,
+      "executedAt": "2026-08-02T22:59:39.7978587+08:00"
+    },
+    {
+      "name": "Operator cannot view user management",
+      "method": "GET",
+      "path": "/system/users?pageNo=1&pageSize=10",
+      "expectedStatus": 403,
+      "actualStatus": 403,
+      "passed": true,
+      "executedAt": "2026-08-02T22:59:39.8714597+08:00"
+    }
+  ]
+}

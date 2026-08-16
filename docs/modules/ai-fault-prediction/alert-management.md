@@ -1,0 +1,36 @@
+# 故障智能预警
+
+## 范围
+
+路由：`/fault-prediction/alert`。预警由未来 AI 引擎写入 `fault_report`，人工端不提供新增或编辑入口，只提供查询、详情、处理和管理员逻辑删除。
+
+## 页面与详情
+
+- 列表可按故障 ID/预测对象、处理状态、风险等级、对象类型筛选并分页。
+- “查看详情”打开 584px 右侧抽屉：固定标题栏、可滚动正文和固定底部操作栏；故障 ID、预测对象、告警时间、指标类别、预测故障类型、预计发生时间、置信度、指标走势、预测说明和处理建议均按原型顺序只读展示。
+- 首屏六项字段使用页面内显式只读结构，不得用运行时字符串模板包装；每次打开抽屉必须将正文滚动位置重置到顶部，首屏顺序固定为故障 ID、预测对象、告警时间、指标类别、预测故障类型、预计发生时间。
+- 趋势图消费 `trend_json` 中的时间和值；无有效趋势数据时显示空图，不伪造诊断结果。
+- 抽屉展示状态、处理人、处理时间和 `result_status_log` 历史；处理动作强制填写备注。
+- 底部固定显示“确认 / 误报 / 关闭”三个原型按钮；不符合当前状态或当前角色权限时禁用，后端仍进行最终校验。
+
+## 接口与数据
+
+- 专用接口：`GET /ai/fault-prediction/alerts`、`GET /ai/fault-prediction/alerts/{id}`、`PATCH /ai/fault-prediction/alerts/{id}/handle`、`DELETE /ai/fault-prediction/alerts/{id}`。
+- 旧 `/ai/fault-reports` CRUD 接口继续保留，供既有调用和后续引擎接入兼容；专用前端不调用其新增、编辑接口。
+- `fault_report` 是唯一预警主表，`result_status_log` 是唯一人工处理审计表，不新增重复表。
+
+## 权限与状态机
+
+| 角色 | 查询/详情 | 确认/误报/关闭 | 删除 |
+| --- | --- | --- | --- |
+| admin | 是 | 是 | 是 |
+| operator | 是 | 是 | 否 |
+| viewer | 是 | 否 | 否 |
+
+- `PENDING -> CONFIRMED` 或 `FALSE_POSITIVE`。
+- `CONFIRMED -> CLOSED`。
+- `FALSE_POSITIVE`、`CLOSED` 为终态，其他跳转由后端拒绝。
+
+## 验证
+
+2026-08-05：后端全量 `mvn verify` 52/52 通过，JaCoCo 行覆盖率 18.04%（879/4872）；前端 `scripts/build-web.ps1` 通过。隔离实例 `18081` 健康检查返回 200，未登录访问专用预警列表返回 401。2026-08-06 首屏字段显式渲染与打开复位滚动修复后，前端 `scripts/build-web.ps1` 再次通过。登录态三角色黑盒和浏览器视觉对照需在设置 `DIAGNOSIS_TEST_PASSWORD` 的可清理测试环境补测。

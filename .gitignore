@@ -1,0 +1,32 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.vs/
+.tmp-chrome-profile/
+
+# Java
+apps/api-server/target/
+apps/api-server/data/knowledge-files/
+*.class
+
+# Frontend
+apps/admin-web/node_modules/
+apps/admin-web/dist/
+apps/admin-web/.vite/
+
+# Logs / env
+*.log
+.env
+.env.*
+
+# Local quality platform
+tools/sonarqube-*/
+tools/sonarqube-*.zip
+tools/nginx-*/
+
+# Windows local deployment runtime
+deploy/windows/.env
+deploy/windows/runtime/
+deploy/windows/packages/
