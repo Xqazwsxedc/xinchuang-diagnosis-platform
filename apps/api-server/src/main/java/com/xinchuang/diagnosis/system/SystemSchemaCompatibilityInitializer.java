@@ -37,7 +37,10 @@ public class SystemSchemaCompatibilityInitializer implements ApplicationRunner {
             "kb_instance",
             "updated_by",
             "ALTER TABLE kb_instance ADD COLUMN updated_by BIGINT NULL"
-        )
+        ),
+        new SchemaChange("ledger_db_resource", "monitor_status", "ALTER TABLE ledger_db_resource ADD COLUMN monitor_status VARCHAR(32) NOT NULL DEFAULT 'PENDING' COMMENT '监控可用状态'"),
+        new SchemaChange("ledger_db_resource", "monitor_message", "ALTER TABLE ledger_db_resource ADD COLUMN monitor_message VARCHAR(500) NULL COMMENT '监控接入说明或失败原因'"),
+        new SchemaChange("ledger_db_resource", "monitor_last_checked_at", "ALTER TABLE ledger_db_resource ADD COLUMN monitor_last_checked_at DATETIME NULL COMMENT '最近监控校验时间'")
     );
 
     private final JdbcTemplate jdbcTemplate;

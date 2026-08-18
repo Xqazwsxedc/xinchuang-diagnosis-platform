@@ -30,3 +30,7 @@ tools/nginx-*/
 deploy/windows/.env
 deploy/windows/runtime/
 deploy/windows/packages/
+
+# Linux MySQL monitoring installation package secrets
+deploy/monitoring/mysql-node/.env
+deploy/monitoring/mysql-node/secrets/my.cnf

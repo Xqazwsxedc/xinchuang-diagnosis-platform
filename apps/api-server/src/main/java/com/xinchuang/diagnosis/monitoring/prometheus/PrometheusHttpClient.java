@@ -3,6 +3,8 @@ package com.xinchuang.diagnosis.monitoring.prometheus;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.xinchuang.diagnosis.monitoring.config.MonitoringProperties;
 import java.net.URI;
+import java.net.HttpURLConnection;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -34,14 +36,24 @@ public class PrometheusHttpClient implements PrometheusClient {
         return request("/api/v1/query_range", promQl, range, true);
     }
 
+    @Override
+    public List<PrometheusPoint> instantQuery(String baseUrl, String authRef, String promQl) {
+        return request(baseUrl, authRef, "/api/v1/query", promQl, null, false);
+    }
+
+    @Override
+    public List<PrometheusPoint> rangeQuery(String baseUrl, String authRef, String promQl, PrometheusRange range) {
+        return request(baseUrl, authRef, "/api/v1/query_range", promQl, range, true);
+    }
+
     private List<PrometheusPoint> request(String path, String promQl, PrometheusRange range, boolean isRange) {
         if (!StringUtils.hasText(properties.getPrometheus().getBaseUrl())) {
             throw new PrometheusException("监控服务地址尚未配置");
         }
         try {
-            JsonNode response = client().get()
+            JsonNode response = client(properties.getPrometheus().getBaseUrl(), null).get()
                 // PromQL 的标签选择器含有花括号，不能交给 Spring URI 模板展开。
-                .uri(buildRequestUri(path, promQl, range))
+                .uri(buildRequestUri(properties.getPrometheus().getBaseUrl(), path, promQl, range))
                 .retrieve()
                 .body(JsonNode.class);
             return parser.parse(response, isRange);
@@ -52,9 +64,23 @@ public class PrometheusHttpClient implements PrometheusClient {
         }
     }
 
-    private URI buildRequestUri(String path, String promQl, PrometheusRange range) {
-        String baseUrl = properties.getPrometheus().getBaseUrl().replaceFirst("/+$", "");
-        StringBuilder uri = new StringBuilder(baseUrl).append(path)
+    private List<PrometheusPoint> request(String baseUrl, String authRef, String path, String promQl, PrometheusRange range, boolean isRange) {
+        try {
+            JsonNode response = client(baseUrl, authRef).get()
+                .uri(buildRequestUri(baseUrl, path, promQl, range))
+                .retrieve()
+                .body(JsonNode.class);
+            return parser.parse(response, isRange);
+        } catch (PrometheusException exception) {
+            throw exception;
+        } catch (RestClientException exception) {
+            throw new PrometheusException("监控服务暂不可用，请稍后重试", exception);
+        }
+    }
+
+    private URI buildRequestUri(String baseUrl, String path, String promQl, PrometheusRange range) {
+        String normalizedBaseUrl = baseUrl.replaceFirst("/+$", "");
+        StringBuilder uri = new StringBuilder(normalizedBaseUrl).append(path)
             .append("?query=")
             .append(encode(promQl));
         if (range != null) {
@@ -69,13 +95,22 @@ public class PrometheusHttpClient implements PrometheusClient {
         return URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20");
     }
 
-    private RestClient client() {
-        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+    private RestClient client(String baseUrl, String authRef) {
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory() {
+            @Override
+            protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
+                super.prepareConnection(connection, httpMethod);
+                connection.setInstanceFollowRedirects(false);
+            }
+        };
         requestFactory.setConnectTimeout(properties.getPrometheus().getConnectTimeout());
         requestFactory.setReadTimeout(properties.getPrometheus().getReadTimeout());
-        return RestClient.builder()
-            .baseUrl(properties.getPrometheus().getBaseUrl())
-            .requestFactory(requestFactory)
-            .build();
+        RestClient.Builder builder = RestClient.builder().baseUrl(baseUrl).requestFactory(requestFactory);
+        if (StringUtils.hasText(authRef)) {
+            String authorization = properties.getPrometheus().getAuthRefs().get(authRef);
+            if (!StringUtils.hasText(authorization)) throw new PrometheusException("Prometheus 凭据引用未配置");
+            builder.defaultHeader("Authorization", authorization);
+        }
+        return builder.build();
     }
 }

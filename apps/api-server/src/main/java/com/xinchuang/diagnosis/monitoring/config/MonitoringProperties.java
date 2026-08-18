@@ -1,6 +1,9 @@
 package com.xinchuang.diagnosis.monitoring.config;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +21,9 @@ public class MonitoringProperties {
         private String baseUrl = "";
         private Duration connectTimeout = Duration.ofSeconds(3);
         private Duration readTimeout = Duration.ofSeconds(8);
+        private List<String> allowedHosts = new ArrayList<>();
+        private List<String> allowedCidrs = new ArrayList<>();
+        private Map<String, String> authRefs = Map.of();
 
         public String getBaseUrl() { return baseUrl; }
         public void setBaseUrl(String baseUrl) { this.baseUrl = baseUrl; }
@@ -25,6 +31,12 @@ public class MonitoringProperties {
         public void setConnectTimeout(Duration connectTimeout) { this.connectTimeout = connectTimeout; }
         public Duration getReadTimeout() { return readTimeout; }
         public void setReadTimeout(Duration readTimeout) { this.readTimeout = readTimeout; }
+        public List<String> getAllowedHosts() { return allowedHosts; }
+        public void setAllowedHosts(List<String> value) { allowedHosts = value == null ? new ArrayList<>() : value; }
+        public List<String> getAllowedCidrs() { return allowedCidrs; }
+        public void setAllowedCidrs(List<String> value) { allowedCidrs = value == null ? new ArrayList<>() : value; }
+        public Map<String, String> getAuthRefs() { return authRefs; }
+        public void setAuthRefs(Map<String, String> value) { authRefs = value == null ? Map.of() : value; }
     }
 
     public static class Targets {

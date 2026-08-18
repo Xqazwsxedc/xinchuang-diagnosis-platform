@@ -2,7 +2,7 @@
 
 ## Source Summary
 
-Word 需求要求数据台账支持业务系统和分布式数据库列表，提供名称、创建人、数据状态筛选，以及新增、编辑、查看、删除。详情页展示基础信息、业务数据、服务器指标、服务器日志，并提供下载入口。
+Word 需求要求数据台账支持业务系统和分布式数据库列表，提供名称、创建人、数据状态筛选，以及新增、编辑、查看、删除。详情页展示基础信息、业务数据、服务器指标、服务器日志，并提供下载入口。分布式数据库列表同时展示资源级监控接入状态；未成功接入监控时，当前数据状况统一显示为“未知”。
 
 ## Current Status
 
@@ -49,6 +49,14 @@ Word 需求要求数据台账支持业务系统和分布式数据库列表，提
 - `/api/ledger/business-systems/{id}/data-records/{recordId}/download`
 - `/api/ledger/db-resources/{id}/metrics`
 - `/api/ledger/db-resources/{id}/metrics/download`
+
+### 指标下载弹窗（2026-08-18）
+
+- 数据库资源详情页点击“下载指标”必须先打开“下载指标数据”弹窗，不得直接下载。
+- 弹窗支持开始日期、结束日期、最近 7 天/30 天/90 天、本月快捷选择；结束日期按自然日包含处理，后端最大日期跨度为 90 天。
+- 指标选择采用白名单：`cpuUsage`（CPU利用率）、`memoryUsage`（内存占比）、`cacheHitRate`（缓存命中率），支持全选和清空；至少选择一项才允许确认下载。
+- 既有下载路径保持不变，旧的 `range` 参数继续兼容；新参数为 `startDate`、`endDate`、`metrics`。后端按所选指标执行 Prometheus query_range，并仅生成所选 CSV 列，同时继续写入导出审计。
+- 日期缺失、倒序、超过 90 天、指标为空或包含未知编码时返回明确业务错误；未接入监控资源仍返回 409，不得回退到演示表或其他资源指标。
 - `/api/ledger/db-resources/{id}/logs`
 - `/api/ledger/db-resources/{id}/logs/download`（可选 `logIds`，逗号分隔、最多 100 条）
 
@@ -85,5 +93,20 @@ Word 需求要求数据台账支持业务系统和分布式数据库列表，提
 ## Prometheus Detail Metrics Update (2026-08-17)
 
 - 指标链路固定为 `Vue -> /api/ledger/db-resources/{id}/metrics -> Spring Boot -> Prometheus HTTP API`；前端禁止直连 Prometheus，服务器日志接口和台账 CRUD 不在本轮范围内。
-- 支持 `1H/3H/6H/12H/1D/3D/7D/14D`。CPU、内存、磁盘 IOPS、当前连接数和缓存命中率均使用即时查询展示顶部值，使用区间查询生成趋势点；CSV 使用同一份实时查询结果，增加“当前连接数”列。
-- 配置仅来自 `MONITORING_PROMETHEUS_*` 和 `MONITORING_TARGETS_*` 环境变量。当前单机验证目标映射写入未提交的 `deploy/windows/.env`，后续容器重建应替换为稳定映射方案。
+
+## Database Monitoring Onboarding Status
+
+- 旧的一次性安装会话、令牌、安装命令和回调流程已停用；平台不执行 SSH、安装脚本、Docker Compose、Prometheus 配置改写或自动 target 注册。
+- 已实现资源级 Prometheus 连接配置：每个数据库资源独立保存 Prometheus 基础地址、凭据引用、数据库类型、node selector、database selector、状态和最近检查结果；新链路不读取旧全局 target，也不自动迁移旧配置。
+- MySQL 强制使用两组精确 selector：node selector 查询 CPU、内存、磁盘 IOPS；database selector 查询当前连接数、缓存命中率。前端不拼 PromQL，后端只生成白名单模板。
+- 已提供 `GET/PUT /api/ledger/db-resources/{id}/monitoring-config` 和 `POST /api/ledger/db-resources/{id}/monitoring-config/test`。测试服务端执行 Prometheus `up` 与 MySQL 健康指标查询，任一 selector 缺失或目标为空时状态为异常，已有配置不删除。
+- 状态为 `UNCONFIGURED/TESTING/HEALTHY/ABNORMAL`；未通过测试的资源不能查询指标，避免资源串用。Prometheus 不可用时仅指标区域报错，日志和资源 CRUD 保持可用。
+- 已加入 SSRF 防护：仅 HTTP(S)、默认拒绝、服务端域名/CIDR allowlist、禁止用户信息/回环/链路本地/云元数据地址，HTTP 重定向不自动跟随；selector 只允许安全 label 键和值。
+- 旧 `MONITORING_PROMETHEUS_*` 和 `MONITORING_TARGETS_*` 配置暂时保留用于回滚兼容，但资源级查询不回退到旧配置。部署必须显式配置 `MONITORING_PROMETHEUS_ALLOWED_HOSTS` 或 `MONITORING_PROMETHEUS_ALLOWED_CIDRS`。
+- 阶段五尚缺真实客户 Prometheus 的手工端到端验收：配置保存、连接成功/失败、目标不存在、资源切换隔离、指标区域局部错误和 CSV 下载需要在允许访问的 Prometheus 环境验证。
+
+## Detail Empty State and Responsive Layout Update (2026-08-18)
+
+- 分布式数据库详情的服务器日志为空时不挂载 `el-table`，只展示中文空状态“当前时间范围暂无服务器日志”，禁止出现 Element Plus 默认 `No Data`。
+- 指标趋势区仅在存在趋势点时渲染四个图表和缓存命中率圆环；无指标时只展示“暂无指标数据”，不渲染空图表骨架。监控接口告警仍可单独显示。
+- 中等宽度窗口下摘要与指标卡片使用两列布局，日志内容区自带横向滚动并保持表格最小可读宽度，避免详情摘要和日志区域错位；接口、数据库结构和下载契约不变。

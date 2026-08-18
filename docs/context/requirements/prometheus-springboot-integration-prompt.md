@@ -142,21 +142,15 @@ mysql_global_status_threads_connected
 
 当前学习环境只有一台云服务器，Prometheus 中的目标使用 Docker 内部地址作为 `instance` 标签。实现时不要把这些内部 IP 写死在业务代码。
 
-请设计可配置的映射方式，优先级如下：
+资源目标映射按数据库资源独立保存，不使用一个全局 Docker 内部 IP 服务所有资源。当前 MySQL 配置包含两组精确 selector：`nodeTargetSelector` 用于 node_exporter 指标，`databaseTargetSelector` 用于 mysqld_exporter 指标。旧环境变量仅保留回滚兼容，新资源级查询不读取旧全局 target。
 
-1. 若现有数据库资源表已包含监控目标、IP、实例地址等字段，复用该字段。
-2. 若没有合适字段，第一阶段可使用配置项，例如：
+不要把 Docker 内部 IP 固化到 Controller、DTO 或 Vue 中；Prometheus 地址必须经过服务端 allowlist 和 SSRF 校验。
 
-```yaml
-monitoring:
-  targets:
-    node-instance: <NODE_EXPORTER_INSTANCE>
-    mysql-instance: <MYSQLD_EXPORTER_INSTANCE>
-```
+## 当前实现状态（2026-08-18）
 
-3. 代码结构必须便于未来改成“每个资源 ID 对应不同 Prometheus target”。
-
-不要把 Docker 内部 IP 固化到 Controller、DTO 或 Vue 中。
+- 已实现资源级 Prometheus 配置、双 selector、服务端连接测试、SSRF 防护和详情页配置入口。
+- MySQL 指标查询已切换到资源配置；其他数据库类型暂不实现。
+- `mvn verify` 98/98 通过，前端生产构建通过；真实客户 Prometheus 端到端验收仍待执行。
 
 ## 七、Prometheus API 与 DTO 要求
 

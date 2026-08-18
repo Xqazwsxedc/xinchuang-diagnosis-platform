@@ -60,6 +60,8 @@ monitoring:
     base-url: ${MONITORING_PROMETHEUS_BASE_URL:}
     connect-timeout: ${MONITORING_PROMETHEUS_CONNECT_TIMEOUT:3s}
     read-timeout: ${MONITORING_PROMETHEUS_READ_TIMEOUT:8s}
+    allowed-hosts: ${MONITORING_PROMETHEUS_ALLOWED_HOSTS:}
+    allowed-cidrs: ${MONITORING_PROMETHEUS_ALLOWED_CIDRS:}
   targets:
     node-instance: ${MONITORING_TARGETS_NODE_INSTANCE:}
     mysql-instance: ${MONITORING_TARGETS_MYSQL_INSTANCE:}

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.xinchuang.diagnosis.common.exception.BusinessException;
 import java.time.Instant;
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 /** 验证页面固定时间范围与 Prometheus start/end/step 的映射稳定。 */
@@ -34,5 +35,22 @@ class PrometheusRangeResolverTest {
     /** 非页面允许范围必须在请求 Prometheus 前拒绝。 */
     void rejectsUnknownRange() {
         assertThrows(BusinessException.class, () -> resolver.resolve("2H", end));
+    }
+
+    @Test
+    /** 日期下载按上海时区覆盖结束日，且最多允许 90 天范围。 */
+    void resolvesInclusiveDateRange() {
+        PrometheusRange range = resolver.resolve(LocalDate.of(2026, 8, 1), LocalDate.of(2026, 8, 7));
+
+        assertEquals(Instant.parse("2026-07-31T16:00:00Z"), range.start());
+        assertEquals(Instant.parse("2026-08-07T16:00:00Z"), range.end());
+    }
+
+    @Test
+    /** 日期缺失、倒序或超出窗口必须被后端拒绝。 */
+    void rejectsInvalidDateRange() {
+        assertThrows(BusinessException.class, () -> resolver.resolve(null, LocalDate.of(2026, 8, 7)));
+        assertThrows(BusinessException.class, () -> resolver.resolve(LocalDate.of(2026, 8, 8), LocalDate.of(2026, 8, 7)));
+        assertThrows(BusinessException.class, () -> resolver.resolve(LocalDate.of(2026, 1, 1), LocalDate.of(2026, 4, 2)));
     }
 }

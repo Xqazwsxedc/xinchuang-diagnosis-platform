@@ -10,6 +10,9 @@ public class DbResource extends BaseEntity {
     private String privateIp;
     private String ownerName;
     private String status;
+    private String monitorStatus;
+    private String monitorMessage;
+    private java.time.LocalDateTime monitorLastCheckedAt;
 
     public String getName() {
         return name;
@@ -50,5 +53,11 @@ public class DbResource extends BaseEntity {
     public void setStatus(String status) {
         this.status = status;
     }
-}
 
+    public String getMonitorStatus() { return monitorStatus; }
+    public void setMonitorStatus(String monitorStatus) { this.monitorStatus = monitorStatus; }
+    public String getMonitorMessage() { return monitorMessage; }
+    public void setMonitorMessage(String monitorMessage) { this.monitorMessage = monitorMessage; }
+    public java.time.LocalDateTime getMonitorLastCheckedAt() { return monitorLastCheckedAt; }
+    public void setMonitorLastCheckedAt(java.time.LocalDateTime monitorLastCheckedAt) { this.monitorLastCheckedAt = monitorLastCheckedAt; }
+}

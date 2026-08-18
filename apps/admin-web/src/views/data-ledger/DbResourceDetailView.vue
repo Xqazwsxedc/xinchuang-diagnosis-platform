@@ -6,6 +6,10 @@
     </button>
 
     <template v-if="resource">
+      <section class="monitor-config-panel">
+        <div><span>Prometheus 监控</span><strong>{{ monitoringStatusText(monitoring.status) }}</strong><small v-if="monitoring.lastErrorMessage">{{ monitoring.lastErrorMessage }}</small><small v-else-if="monitoring.lastCheckedAt">最近检查：{{ formatTime(monitoring.lastCheckedAt) }}</small></div>
+        <div class="monitor-config-actions"><el-button v-if="canManageMonitoring" @click="openMonitoringConfig">监控配置</el-button><el-button v-if="canManageMonitoring && monitoring.prometheusBaseUrl" type="primary" :loading="monitoringTesting" @click="testMonitoring">测试连接</el-button></div>
+      </section>
       <section class="detail-summary db-summary">
         <div class="summary-item"><span>服务器名称</span><strong>{{ resource.name }}</strong></div>
         <div class="summary-item"><span>公网IP</span><strong>{{ resource.publicIp }}</strong></div>
@@ -46,52 +50,54 @@
 
         <div v-if="activeTab === 'metrics'" class="chart-grid" v-loading="metricsLoading">
           <el-alert v-if="metricError" class="metric-alert" type="warning" :closable="false" show-icon :title="metricError" />
-          <article class="chart-card">
-            <h2>CPU利用率</h2>
-            <svg class="line-chart" viewBox="0 0 360 180" role="img" aria-label="CPU利用率趋势">
-              <line v-for="y in [30, 70, 110, 150]" :key="y" x1="42" x2="338" :y1="y" :y2="y" class="chart-gridline" />
-              <polyline :points="linePoints('cpuUsage')" class="cpu-line" fill="none" />
-              <text v-for="item in axisLabels" :key="item.label" :x="item.x" y="173" class="chart-label" text-anchor="middle">{{ item.label }}</text>
-            </svg>
-          </article>
-          <article class="chart-card">
-            <h2>内存使用占比</h2>
-            <svg class="line-chart" viewBox="0 0 360 180" role="img" aria-label="内存使用占比趋势">
-              <line v-for="y in [30, 70, 110, 150]" :key="y" x1="42" x2="338" :y1="y" :y2="y" class="chart-gridline" />
-              <polyline :points="linePoints('memoryUsage')" class="memory-line" fill="none" />
-              <text v-for="item in axisLabels" :key="item.label" :x="item.x" y="173" class="chart-label" text-anchor="middle">{{ item.label }}</text>
-            </svg>
-          </article>
-          <article class="chart-card">
-            <h2>当前连接数</h2>
-            <svg class="line-chart" viewBox="0 0 360 180" role="img" aria-label="当前连接数趋势">
-              <line v-for="y in [30, 70, 110, 150]" :key="y" x1="42" x2="338" :y1="y" :y2="y" class="chart-gridline" />
-              <polyline :points="linePoints('currentConnections')" class="connection-line" fill="none" />
-              <text v-for="item in axisLabels" :key="item.label" :x="item.x" y="173" class="chart-label" text-anchor="middle">{{ item.label }}</text>
-            </svg>
-          </article>
-          <article class="chart-card cache-chart-card">
-            <h2>缓存命中率</h2>
-            <div class="donut-wrap">
-              <svg viewBox="0 0 180 150" role="img" aria-label="缓存命中率">
-                <circle cx="75" cy="76" r="44" pathLength="100" class="donut-base" />
-                <circle cx="75" cy="76" r="44" pathLength="100" class="donut-value" :stroke-dasharray="cacheDasharray" />
-                <text x="75" y="82" text-anchor="middle" class="donut-number">{{ displayPercent(metrics.cacheHitRate) }}</text>
+          <template v-if="metrics.points.length > 0">
+            <article class="chart-card">
+              <h2>CPU利用率</h2>
+              <svg class="line-chart" viewBox="0 0 360 180" role="img" aria-label="CPU利用率趋势">
+                <line v-for="y in [30, 70, 110, 150]" :key="y" x1="42" x2="338" :y1="y" :y2="y" class="chart-gridline" />
+                <polyline :points="linePoints('cpuUsage')" class="cpu-line" fill="none" />
+                <text v-for="item in axisLabels" :key="item.label" :x="item.x" y="173" class="chart-label" text-anchor="middle">{{ item.label }}</text>
               </svg>
-              <div class="cache-legend"><span><i class="hit-dot" />命中</span><span><i class="miss-dot" />未命中</span></div>
-            </div>
-          </article>
-          <el-empty v-if="!metricsLoading && metrics.points.length === 0" class="metric-empty" description="当前时间范围暂无指标数据" />
+            </article>
+            <article class="chart-card">
+              <h2>内存使用占比</h2>
+              <svg class="line-chart" viewBox="0 0 360 180" role="img" aria-label="内存使用占比趋势">
+                <line v-for="y in [30, 70, 110, 150]" :key="y" x1="42" x2="338" :y1="y" :y2="y" class="chart-gridline" />
+                <polyline :points="linePoints('memoryUsage')" class="memory-line" fill="none" />
+                <text v-for="item in axisLabels" :key="item.label" :x="item.x" y="173" class="chart-label" text-anchor="middle">{{ item.label }}</text>
+              </svg>
+            </article>
+            <article class="chart-card">
+              <h2>当前连接数</h2>
+              <svg class="line-chart" viewBox="0 0 360 180" role="img" aria-label="当前连接数趋势">
+                <line v-for="y in [30, 70, 110, 150]" :key="y" x1="42" x2="338" :y1="y" :y2="y" class="chart-gridline" />
+                <polyline :points="linePoints('currentConnections')" class="connection-line" fill="none" />
+                <text v-for="item in axisLabels" :key="item.label" :x="item.x" y="173" class="chart-label" text-anchor="middle">{{ item.label }}</text>
+              </svg>
+            </article>
+            <article class="chart-card cache-chart-card">
+              <h2>缓存命中率</h2>
+              <div class="donut-wrap">
+                <svg viewBox="0 0 180 150" role="img" aria-label="缓存命中率">
+                  <circle cx="75" cy="76" r="44" pathLength="100" class="donut-base" />
+                  <circle cx="75" cy="76" r="44" pathLength="100" class="donut-value" :stroke-dasharray="cacheDasharray" />
+                  <text x="75" y="82" text-anchor="middle" class="donut-number">{{ displayPercent(metrics.cacheHitRate) }}</text>
+                </svg>
+                <div class="cache-legend"><span><i class="hit-dot" />命中</span><span><i class="miss-dot" />未命中</span></div>
+              </div>
+            </article>
+          </template>
+          <el-empty v-else-if="!metricsLoading && !metricError" class="metric-empty" description="暂无指标数据" />
         </div>
 
         <div v-else class="log-content" v-loading="logsLoading">
-          <el-table :data="logs" row-key="id" stripe class="detail-table" @selection-change="handleLogSelection">
+          <el-table v-if="logs.length > 0" :data="logs" row-key="id" stripe class="detail-table" @selection-change="handleLogSelection">
             <el-table-column type="selection" width="52" />
             <el-table-column label="日志时间" min-width="190"><template #default="{ row }">{{ formatTime(row.loggedAt) }}</template></el-table-column>
             <el-table-column label="级别" width="120"><template #default="{ row }"><el-tag :type="logType(row.logLevel)" round>{{ row.logLevel }}</el-tag></template></el-table-column>
             <el-table-column prop="logContent" label="日志内容" min-width="560" show-overflow-tooltip />
           </el-table>
-          <el-empty v-if="!logsLoading && logs.length === 0" description="当前时间范围暂无服务器日志" />
+          <el-empty v-else-if="!logsLoading" description="当前时间范围暂无服务器日志" />
           <div v-if="logTotal > 0" class="log-pagination">
             <el-pagination v-model:current-page="logPageNo" :page-size="10" layout="total, prev, pager, next" :total="logTotal" @change="loadLogs" />
           </div>
@@ -99,6 +105,47 @@
       </section>
     </template>
     <el-empty v-else-if="!loading" description="分布式数据库不存在或已删除" />
+
+    <el-dialog v-model="monitoringConfigVisible" title="监控配置" width="620px" destroy-on-close>
+      <el-form label-position="top">
+        <el-form-item label="Prometheus API 地址" required><el-input v-model="monitoringForm.prometheusBaseUrl" placeholder="https://prometheus.customer.example" /></el-form-item>
+        <el-form-item label="数据库类型" required><el-select v-model="monitoringForm.databaseType" style="width:100%"><el-option label="MySQL" value="MYSQL" /></el-select></el-form-item>
+        <el-form-item label="node_exporter 目标（job）" required><el-input v-model="monitoringForm.nodeJob" placeholder="node-exporter" /></el-form-item>
+        <el-form-item label="node_exporter 目标（instance）" required><el-input v-model="monitoringForm.nodeInstance" placeholder="10.0.0.10:9100" /></el-form-item>
+        <el-form-item label="mysqld_exporter 目标（job）" required><el-input v-model="monitoringForm.databaseJob" placeholder="mysqld-exporter" /></el-form-item>
+        <el-form-item label="mysqld_exporter 目标（instance）" required><el-input v-model="monitoringForm.databaseInstance" placeholder="10.0.0.10:9104" /></el-form-item>
+        <el-form-item label="服务端凭据引用（可选）"><el-input v-model="monitoringForm.prometheusAuthRef" placeholder="仅填写服务端已配置的引用，不填写 token" /></el-form-item>
+      </el-form>
+      <template #footer><el-button @click="monitoringConfigVisible = false">取消</el-button><el-button type="primary" :loading="monitoringSaving" @click="saveMonitoring">保存配置</el-button></template>
+    </el-dialog>
+
+    <el-dialog v-model="downloadVisible" title="下载指标数据" width="520px" class="metric-download-dialog" destroy-on-close>
+      <el-form label-position="top" class="download-form">
+        <el-form-item label="日期范围" required>
+          <div class="date-range-fields">
+            <el-date-picker v-model="downloadStartDate" type="date" value-format="YYYY-MM-DD" placeholder="开始日期" :clearable="false" />
+            <span>至</span>
+            <el-date-picker v-model="downloadEndDate" type="date" value-format="YYYY-MM-DD" placeholder="结束日期" :clearable="false" />
+          </div>
+          <div class="date-shortcuts">
+            <el-button v-for="shortcut in dateShortcuts" :key="shortcut.label" link type="primary" @click="applyDateShortcut(shortcut.days)">{{ shortcut.label }}</el-button>
+          </div>
+        </el-form-item>
+        <el-form-item label="指标选择" required>
+          <div class="metric-select-toolbar">
+            <el-checkbox :model-value="allDownloadMetricsSelected" @change="toggleAllDownloadMetrics">全选</el-checkbox>
+            <el-button link type="primary" @click="selectedDownloadMetrics = []">清空</el-button>
+          </div>
+          <el-checkbox-group v-model="selectedDownloadMetrics" class="metric-checkboxes">
+            <el-checkbox v-for="item in downloadMetrics" :key="item.value" :label="item.value">{{ item.label }}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="downloadVisible = false">取消</el-button>
+        <el-button type="primary" :loading="downloading" :disabled="!selectedDownloadMetrics.length" @click="confirmMetricDownload">确认下载</el-button>
+      </template>
+    </el-dialog>
   </section>
 </template>
 
@@ -112,15 +159,27 @@ import {
   getDbInstanceLogs,
   getDbMetrics,
   getDbResourceDetail,
+  getDbMonitoringConfig,
+  saveDbMonitoringConfig,
+  testDbMonitoringConfig,
   type DbInstanceLogItem,
+  type DbMonitoringConfig,
   type DbMetricsOverview,
   type DbResourceItem,
   type MetricRange
 } from '@/api/modules/ledger'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
+const canManageMonitoring = computed(() => userStore.hasPermission('ledger:database:update'))
 const resource = ref<DbResourceItem | null>(null)
+const monitoring = ref<DbMonitoringConfig>({ status: 'UNCONFIGURED' })
+const monitoringConfigVisible = ref(false)
+const monitoringSaving = ref(false)
+const monitoringTesting = ref(false)
+const monitoringForm = ref({ prometheusBaseUrl: '', prometheusAuthRef: '', databaseType: 'MYSQL', nodeJob: '', nodeInstance: '', databaseJob: '', databaseInstance: '' })
 const metrics = ref<DbMetricsOverview>({ points: [] })
 const logs = ref<DbInstanceLogItem[]>([])
 const loading = ref(false)
@@ -128,6 +187,21 @@ const metricsLoading = ref(false)
 const metricError = ref('')
 const logsLoading = ref(false)
 const downloading = ref(false)
+const downloadVisible = ref(false)
+const downloadStartDate = ref('')
+const downloadEndDate = ref('')
+const selectedDownloadMetrics = ref<string[]>([])
+const downloadMetrics = [
+  { label: 'CPU利用率', value: 'cpuUsage' },
+  { label: '内存占比', value: 'memoryUsage' },
+  { label: '缓存命中率', value: 'cacheHitRate' }
+]
+const dateShortcuts = [
+  { label: '最近7天', days: 7 },
+  { label: '最近30天', days: 30 },
+  { label: '最近90天', days: 90 },
+  { label: '本月', days: 0 }
+]
 const activeTab = ref<'metrics' | 'logs'>('metrics')
 const range = ref<MetricRange>('1D')
 const logPageNo = ref(1)
@@ -149,16 +223,67 @@ const axisLabels = computed(() => {
   const indices = [...new Set([0, Math.floor((points.length - 1) / 3), Math.floor((points.length - 1) * 2 / 3), points.length - 1])]
   return indices.map((index) => ({ label: formatChartTime(points[index].sampledAt), x: chartX(index, points.length) }))
 })
+const allDownloadMetricsSelected = computed(() => selectedDownloadMetrics.value.length === downloadMetrics.length)
 
 async function loadPage() {
   loading.value = true
   try {
     resource.value = await getDbResourceDetail(resourceId())
+    try { monitoring.value = await getDbMonitoringConfig(resourceId()) } catch { monitoring.value = { status: 'UNCONFIGURED' } }
     await Promise.all([loadMetrics(), loadLogs()])
   } finally {
     loading.value = false
   }
 }
+
+function openMonitoringConfig() {
+  const node = monitoring.value.nodeTargetSelector || {}
+  const database = monitoring.value.databaseTargetSelector || {}
+  monitoringForm.value = {
+    prometheusBaseUrl: monitoring.value.prometheusBaseUrl || '',
+    prometheusAuthRef: '',
+    databaseType: monitoring.value.databaseType || 'MYSQL',
+    nodeJob: node.job || '', nodeInstance: node.instance || '',
+    databaseJob: database.job || '', databaseInstance: database.instance || ''
+  }
+  monitoringConfigVisible.value = true
+}
+
+async function saveMonitoring() {
+  const form = monitoringForm.value
+  if (!form.prometheusBaseUrl || !form.nodeJob || !form.nodeInstance || !form.databaseJob || !form.databaseInstance) {
+    ElMessage.warning('请完整填写 Prometheus 地址和两组目标 selector')
+    return
+  }
+  monitoringSaving.value = true
+  try {
+    monitoring.value = await saveDbMonitoringConfig(resourceId(), {
+      prometheusBaseUrl: form.prometheusBaseUrl,
+      prometheusAuthRef: form.prometheusAuthRef || undefined,
+      databaseType: form.databaseType,
+      nodeTargetSelector: { job: form.nodeJob, instance: form.nodeInstance },
+      databaseTargetSelector: { job: form.databaseJob, instance: form.databaseInstance }
+    })
+    monitoringConfigVisible.value = false
+    ElMessage.success('监控配置已保存，请测试连接')
+  } catch (error) { ElMessage.error(error instanceof Error ? error.message : '保存监控配置失败') }
+  finally { monitoringSaving.value = false }
+}
+
+async function testMonitoring() {
+  monitoringTesting.value = true
+  try {
+    monitoring.value = await testDbMonitoringConfig(resourceId())
+    ElMessage.success('Prometheus 连接和目标测试通过')
+    await loadMetrics()
+  } catch (error) { ElMessage.error(error instanceof Error ? error.message : 'Prometheus 连接测试失败'); await getDbMonitoringConfig(resourceId()).then(value => { monitoring.value = value }).catch(() => undefined) }
+  finally { monitoringTesting.value = false }
+}
+
+function monitoringStatusText(status: DbMonitoringConfig['status']) {
+  return ({ UNCONFIGURED: '未配置', TESTING: '测试中', HEALTHY: '正常', ABNORMAL: '异常' } as Record<string, string>)[status] || '未配置'
+}
+
 
 async function loadMetrics() {
   metricsLoading.value = true
@@ -167,7 +292,9 @@ async function loadMetrics() {
     metrics.value = await getDbMetrics(resourceId(), range.value)
   } catch (error) {
     metrics.value = { points: [] }
-    metricError.value = error instanceof Error ? error.message : '监控服务暂不可用，请稍后重试'
+    metricError.value = typeof error === 'object' && error !== null && 'message' in error
+      ? String(error.message)
+      : error instanceof Error ? error.message : '监控服务暂不可用，请稍后重试'
   } finally {
     metricsLoading.value = false
   }
@@ -197,27 +324,88 @@ async function handleTabChange() {
 }
 
 async function downloadActive() {
+  if (activeTab.value === 'metrics') {
+    openMetricDownload()
+    return
+  }
   downloading.value = true
   try {
-    const path = activeTab.value === 'metrics'
-      ? `/ledger/db-resources/${resourceId()}/metrics/download`
-      : `/ledger/db-resources/${resourceId()}/logs/download`
-    const file = await downloadLedgerFile(path, {
+    const file = await downloadLedgerFile(`/ledger/db-resources/${resourceId()}/logs/download`, {
       range: range.value,
-      ...(activeTab.value === 'logs' ? { logIds: selectedLogIds.value.join(',') } : {})
+      logIds: selectedLogIds.value.join(',')
     })
-    const link = document.createElement('a')
-    const url = URL.createObjectURL(file.blob)
-    link.href = url
-    link.download = file.fileName
-    link.click()
-    URL.revokeObjectURL(url)
-    ElMessage.success(activeTab.value === 'metrics' ? '指标下载已开始' : '日志下载已开始')
+    saveDownloadedFile(file)
+    ElMessage.success('日志下载已开始')
   } catch (error) {
     ElMessage.error(error instanceof Error ? error.message : '下载失败，请稍后重试')
   } finally {
     downloading.value = false
   }
+}
+
+function openMetricDownload() {
+  const today = new Date()
+  downloadEndDate.value = formatDateInput(today)
+  const start = new Date(today)
+  start.setDate(today.getDate() - 6)
+  downloadStartDate.value = formatDateInput(start)
+  selectedDownloadMetrics.value = downloadMetrics.map((item) => item.value)
+  downloadVisible.value = true
+}
+
+function applyDateShortcut(days: number) {
+  const today = new Date()
+  downloadEndDate.value = formatDateInput(today)
+  if (days === 0) {
+    downloadStartDate.value = formatDateInput(new Date(today.getFullYear(), today.getMonth(), 1))
+    return
+  }
+  const start = new Date(today)
+  start.setDate(today.getDate() - days + 1)
+  downloadStartDate.value = formatDateInput(start)
+}
+
+function toggleAllDownloadMetrics(value: string | number | boolean) {
+  selectedDownloadMetrics.value = value ? downloadMetrics.map((item) => item.value) : []
+}
+
+async function confirmMetricDownload() {
+  if (!downloadStartDate.value || !downloadEndDate.value) {
+    ElMessage.warning('请选择日期范围')
+    return
+  }
+  if (downloadStartDate.value > downloadEndDate.value) {
+    ElMessage.warning('开始日期不能晚于结束日期')
+    return
+  }
+  downloading.value = true
+  try {
+    const file = await downloadLedgerFile(`/ledger/db-resources/${resourceId()}/metrics/download`, {
+      startDate: downloadStartDate.value,
+      endDate: downloadEndDate.value,
+      metrics: selectedDownloadMetrics.value.join(',')
+    })
+    saveDownloadedFile(file)
+    downloadVisible.value = false
+    ElMessage.success('指标下载已开始')
+  } catch (error) {
+    ElMessage.error(error instanceof Error ? error.message : '下载失败，请稍后重试')
+  } finally {
+    downloading.value = false
+  }
+}
+
+function saveDownloadedFile(file: { fileName: string; blob: Blob }) {
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(file.blob)
+  link.href = url
+  link.download = file.fileName
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+function formatDateInput(date: Date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
 function handleLogSelection(selectedLogs: DbInstanceLogItem[]) {
@@ -302,6 +490,7 @@ onMounted(loadPage)
   background: #eef4ff;
   box-shadow: 0 6px 18px rgba(30, 64, 175, 0.08);
 }
+.monitor-config-panel { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-top:24px; padding:16px 24px; border:1px solid #dce7fa; border-radius:8px; background:#fff; }.monitor-config-panel span,.monitor-config-panel small { display:block; color:#7185ad; font-size:13px; }.monitor-config-panel strong { display:block; margin:4px 0; color:#071d48; }.monitor-config-actions { display:flex; gap:8px; }
 
 .db-summary { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; }
 .summary-item { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -350,11 +539,24 @@ onMounted(loadPage)
 .hit-dot { background: #2449b8; }.miss-dot { background: #e92f2f; }
 .metric-empty { grid-column: 1 / -1; }
 
-.log-content { min-height: 280px; }
+.log-content { min-width: 0; min-height: 280px; overflow-x: auto; }
+.detail-table { min-width: 920px; }
 .detail-table :deep(th.el-table__cell) { height: 42px; color: #071d48; background: #f1f5f9; font-weight: 700; }
 .detail-table :deep(td.el-table__cell) { height: 58px; color: #0d2450; }
 .log-pagination { display: flex; justify-content: flex-end; padding: 16px; }
 
-@media (max-width: 1300px) { .metric-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.download-form { padding: 4px 12px 0; }
+.download-form :deep(.el-form-item) { margin-bottom: 24px; }
+.download-form :deep(.el-form-item__label) { color: #1b2b4b; font-size: 14px; font-weight: 700; }
+.date-range-fields { display: flex; align-items: center; gap: 10px; width: 100%; }
+.date-range-fields :deep(.el-date-editor) { flex: 1; width: auto; }
+.date-shortcuts { display: flex; gap: 18px; margin-top: 10px; }
+.metric-select-toolbar { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+.metric-checkboxes { display: flex; flex-direction: column; gap: 12px; }
+.metric-checkboxes :deep(.el-checkbox) { margin-right: 0; }
+.metric-download-dialog :deep(.el-dialog__title) { color: #102a56; font-weight: 700; }
+.metric-download-dialog :deep(.el-dialog__footer) { border-top: 1px solid #edf1f7; }
+
+@media (max-width: 1300px) { .db-summary, .metric-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 720px) { .db-detail-page { padding: 24px 16px 32px; }.db-summary, .metric-cards, .chart-grid { grid-template-columns: 1fr; }.panel-toolbar { align-items: flex-start; gap: 12px; flex-direction: column; }.tab-toolbar :deep(.el-button) { align-self: flex-end; } }
 </style>

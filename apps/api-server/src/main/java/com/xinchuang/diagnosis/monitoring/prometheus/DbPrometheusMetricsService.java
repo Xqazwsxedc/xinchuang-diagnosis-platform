@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import org.springframework.stereotype.Service;
@@ -31,25 +33,49 @@ public class DbPrometheusMetricsService {
 
     public DbMetricsOverviewVO load(String rangeCode) {
         PrometheusRange range = rangeResolver.resolve(rangeCode, Instant.now());
+        return load(range, Set.of("cpuUsage", "memoryUsage", "diskIops", "currentConnections", "cacheHitRate"));
+    }
+
+    public DbMetricsOverviewVO load(PrometheusRange range, Set<String> metricCodes) {
+        return loadInternal(range, metricCodes, null, null, null, null);
+    }
+
+    public DbMetricsOverviewVO load(PrometheusRange range, Set<String> metricCodes, String baseUrl, String authRef,
+                                    Map<String, String> nodeSelector, Map<String, String> databaseSelector) {
+        return loadInternal(range, metricCodes, baseUrl, authRef, nodeSelector, databaseSelector);
+    }
+
+    private DbMetricsOverviewVO loadInternal(PrometheusRange range, Set<String> metricCodes, String baseUrl, String authRef,
+                                             Map<String, String> nodeSelector, Map<String, String> databaseSelector) {
+        boolean resourceScoped = baseUrl != null;
         DbMetricsOverviewVO overview = new DbMetricsOverviewVO();
-        overview.setCpuUsage(latest(queries.cpuUsage()));
-        overview.setMemoryUsage(latest(queries.memoryUsage()));
-        overview.setDiskIops(integer(latest(queries.diskIops())));
-        overview.setCurrentConnections(integer(latest(queries.mysqlConnections())));
-        overview.setCacheHitRate(latest(queries.cacheHitRate()));
+        String cpu = resourceScoped ? queries.cpuUsage(nodeSelector) : queries.cpuUsage();
+        String memory = resourceScoped ? queries.memoryUsage(nodeSelector) : queries.memoryUsage();
+        String disk = resourceScoped ? queries.diskIops(nodeSelector) : queries.diskIops();
+        String connections = resourceScoped ? queries.mysqlConnections(databaseSelector) : queries.mysqlConnections();
+        String cache = resourceScoped ? queries.cacheHitRate(databaseSelector) : queries.cacheHitRate();
+        if (metricCodes.contains("cpuUsage")) overview.setCpuUsage(latest(baseUrl, authRef, cpu));
+        if (metricCodes.contains("memoryUsage")) overview.setMemoryUsage(latest(baseUrl, authRef, memory));
+        if (metricCodes.contains("diskIops")) overview.setDiskIops(integer(latest(baseUrl, authRef, disk)));
+        if (metricCodes.contains("currentConnections")) overview.setCurrentConnections(integer(latest(baseUrl, authRef, connections)));
+        if (metricCodes.contains("cacheHitRate")) overview.setCacheHitRate(latest(baseUrl, authRef, cache));
 
         Map<Instant, DbMetricPointVO> points = new TreeMap<>();
-        merge(points, client.rangeQuery(queries.cpuUsage(), range), DbMetricPointVO::setCpuUsage);
-        merge(points, client.rangeQuery(queries.memoryUsage(), range), DbMetricPointVO::setMemoryUsage);
-        mergeInteger(points, client.rangeQuery(queries.diskIops(), range), DbMetricPointVO::setDiskIops);
-        mergeInteger(points, client.rangeQuery(queries.mysqlConnections(), range), DbMetricPointVO::setCurrentConnections);
-        merge(points, client.rangeQuery(queries.cacheHitRate(), range), DbMetricPointVO::setCacheHitRate);
+        if (metricCodes.contains("cpuUsage")) merge(points, range(baseUrl, authRef, cpu, range), DbMetricPointVO::setCpuUsage);
+        if (metricCodes.contains("memoryUsage")) merge(points, range(baseUrl, authRef, memory, range), DbMetricPointVO::setMemoryUsage);
+        if (metricCodes.contains("diskIops")) mergeInteger(points, range(baseUrl, authRef, disk, range), DbMetricPointVO::setDiskIops);
+        if (metricCodes.contains("currentConnections")) mergeInteger(points, range(baseUrl, authRef, connections, range), DbMetricPointVO::setCurrentConnections);
+        if (metricCodes.contains("cacheHitRate")) merge(points, range(baseUrl, authRef, cache, range), DbMetricPointVO::setCacheHitRate);
         overview.setPoints(List.copyOf(points.values()));
         return overview;
     }
 
-    private BigDecimal latest(String query) {
-        return client.instantQuery(query).stream().findFirst().map(point -> scale(point.value())).orElse(null);
+    private BigDecimal latest(String baseUrl, String authRef, String query) {
+        return (baseUrl == null ? client.instantQuery(query) : client.instantQuery(baseUrl, authRef, query)).stream().findFirst().map(point -> scale(point.value())).orElse(null);
+    }
+
+    private List<PrometheusPoint> range(String baseUrl, String authRef, String query, PrometheusRange selectedRange) {
+        return baseUrl == null ? client.rangeQuery(query, selectedRange) : client.rangeQuery(baseUrl, authRef, query, selectedRange);
     }
 
     private void merge(Map<Instant, DbMetricPointVO> target, List<PrometheusPoint> source,

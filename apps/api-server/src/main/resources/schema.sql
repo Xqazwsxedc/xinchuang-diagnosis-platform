@@ -5,6 +5,9 @@ CREATE TABLE IF NOT EXISTS ledger_db_resource (
   private_ip VARCHAR(64) NULL COMMENT '内网IP',
   owner_name VARCHAR(64) NOT NULL COMMENT '负责人',
   status VARCHAR(32) NOT NULL DEFAULT 'NORMAL' COMMENT '状态：NORMAL/WARNING/DANGER/OFFLINE',
+  monitor_status VARCHAR(32) NOT NULL DEFAULT 'PENDING' COMMENT '监控可用状态：PENDING/NORMAL/ABNORMAL',
+  monitor_message VARCHAR(500) NULL COMMENT '监控接入说明或失败原因',
+  monitor_last_checked_at DATETIME NULL COMMENT '最近监控校验时间',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   created_by BIGINT NULL,
@@ -13,8 +16,45 @@ CREATE TABLE IF NOT EXISTS ledger_db_resource (
   KEY idx_db_resource_name (name),
   KEY idx_db_resource_owner (owner_name),
   KEY idx_db_resource_status (status),
+  KEY idx_db_resource_monitor_status (monitor_status),
   KEY idx_db_resource_deleted (deleted)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='数据台账-分布式数据库资源';
+
+CREATE TABLE IF NOT EXISTS ledger_db_monitor_node (
+  id BIGINT PRIMARY KEY,
+  resource_id BIGINT NOT NULL COMMENT '数据库资源ID',
+  node_name VARCHAR(100) NOT NULL COMMENT '节点名称',
+  node_role VARCHAR(32) NOT NULL DEFAULT 'PRIMARY' COMMENT '节点角色',
+  private_ip VARCHAR(64) NOT NULL COMMENT '节点内网IP',
+  public_ip VARCHAR(64) NULL COMMENT '节点公网IP',
+  database_type VARCHAR(64) NULL COMMENT '数据库类型',
+  node_exporter_target VARCHAR(128) NULL COMMENT 'node exporter目标',
+  db_exporter_target VARCHAR(128) NULL COMMENT '数据库exporter目标',
+  node_status VARCHAR(32) NOT NULL DEFAULT 'PENDING' COMMENT '节点接入状态',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_by BIGINT NULL, updated_by BIGINT NULL, deleted TINYINT NOT NULL DEFAULT 0,
+  KEY idx_monitor_node_resource (resource_id), KEY idx_monitor_node_deleted (deleted)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='数据库监控接入节点';
+
+CREATE TABLE IF NOT EXISTS ledger_db_monitoring_config (
+  id BIGINT PRIMARY KEY,
+  resource_id BIGINT NOT NULL,
+  prometheus_base_url VARCHAR(500) NOT NULL,
+  prometheus_auth_ref VARCHAR(128) NULL,
+  node_target_selector JSON NOT NULL,
+  database_target_selector JSON NOT NULL,
+  database_type VARCHAR(64) NOT NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'UNCONFIGURED',
+  last_checked_at DATETIME NULL,
+  last_error_message VARCHAR(500) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_by BIGINT NULL,
+  updated_by BIGINT NULL,
+  deleted TINYINT NOT NULL DEFAULT 0,
+  UNIQUE KEY uk_db_monitoring_config_resource (resource_id, deleted),
+  KEY idx_db_monitoring_config_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='数据库资源 Prometheus 监控配置';
 
 CREATE TABLE IF NOT EXISTS ledger_business_system (
   id BIGINT PRIMARY KEY,

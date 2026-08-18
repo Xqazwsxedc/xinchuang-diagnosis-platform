@@ -9,6 +9,8 @@ public class DbResourceVO {
     private String privateIp;
     private String ownerName;
     private String status;
+    /** Resource-level monitoring connectivity; deliberately exposes no endpoint or credentials. */
+    private String monitoringStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -60,6 +62,13 @@ public class DbResourceVO {
         this.status = status;
     }
 
+    public String getMonitoringStatus() {
+        return monitoringStatus;
+    }
+
+    public void setMonitoringStatus(String monitoringStatus) {
+        this.monitoringStatus = monitoringStatus;
+    }
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -76,4 +85,3 @@ public class DbResourceVO {
         this.updatedAt = updatedAt;
     }
 }
-

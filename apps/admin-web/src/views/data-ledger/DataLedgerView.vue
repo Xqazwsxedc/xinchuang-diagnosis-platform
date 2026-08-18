@@ -54,9 +54,16 @@
             <span>{{ row.privateIp || '-' }}</span>
           </template>
         </el-table-column>
+        <el-table-column v-if="activeTab === 'database'" prop="monitoringStatus" label="监控状态" width="130">
+          <template #default="{ row }">
+            <el-tag :type="monitoringStatusType(row.monitoringStatus)" round>
+              {{ monitoringStatusText(row.monitoringStatus) }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="status" label="当前数据状况" width="150">
           <template #default="{ row }">
-            <el-tag :type="statusType(row.status)" round>{{ statusText(row.status) }}</el-tag>
+            <el-tag :type="dataStatusType(row)" round>{{ dataStatusText(row) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="updatedAt" label="更新时间" width="180">
@@ -261,6 +268,24 @@ function statusType(status?: string) {
 function statusText(status?: string) {
   const map: Record<string, string> = { NORMAL: '正常', WARNING: '警告', DANGER: '危险', OFFLINE: '离线' }
   return status ? map[status] || status : '-'
+}
+
+function monitoringStatusText(status?: DbResourceItem['monitoringStatus']) {
+  return status === 'CONNECTED' ? '已接入' : '未接入'
+}
+
+function monitoringStatusType(status?: DbResourceItem['monitoringStatus']) {
+  return status === 'CONNECTED' ? 'success' : 'info'
+}
+
+function dataStatusText(row: LedgerRecord) {
+  if (activeTab.value === 'database' && (!('monitoringStatus' in row) || row.monitoringStatus !== 'CONNECTED')) return '未知'
+  return statusText(row.status)
+}
+
+function dataStatusType(row: LedgerRecord) {
+  if (activeTab.value === 'database' && (!('monitoringStatus' in row) || row.monitoringStatus !== 'CONNECTED')) return 'info'
+  return statusType(row.status)
 }
 
 function formatTime(value?: string) {

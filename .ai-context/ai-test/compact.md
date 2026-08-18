@@ -65,3 +65,5 @@
 - 审计时间回归：`MybatisMetaObjectHandlerTest` 验证更新填充会覆盖已有旧 `updatedAt`。台账编辑验收须确认列表更新时间变为本次保存时间，而非创建时间。
 - 2026-08-17 Prometheus 白盒基线：新增 `PrometheusResponseParserTest`（matrix/vector、NaN/Inf、非 success）、`PrometheusRangeResolverTest`（8 个范围映射边界）和 `DbPrometheusMetricsServiceTest`（五类指标合并与当前连接数）。后端 `mvn test` 91/91 通过，前端生产构建通过。真实 HTTP、登录态指标下载和页面视觉验收待本机 `MONITORING_PROMETHEUS_BASE_URL` 配置后补测；不得用单测替代真实 Prometheus 联调。
 - 2026-08-17 真实登录态指标接口曾复现 URI 模板异常：`{instance=...}` 的 PromQL 触发 HTTP 500。已新增 `PrometheusHttpClientTest`，通过本地 HTTP Server 断言花括号百分号编码且响应可解析；后端全量 JUnit 92/92 通过，重新部署后登录态 `/ledger/db-resources/{id}/metrics?range=1D` 返回业务码 200、14 个趋势点及实时 CPU/连接数。其余七个范围、CSV 和页面视觉仍须单独验收。
+- 2026-08-18 指标下载弹窗已完成前端生产构建；新增日期范围解析白盒用例，覆盖上海时区结束日包含、倒序/缺失/超90天拒绝。待 Maven 仓库网络恢复后复跑全量单测，并在真实 Prometheus 登录态验证弹窗下载、所选 CSV 列、空选择和未接入资源拒绝。
+- 2026-08-18 数据库详情页空态回归要求：日志 `records=[]` 时页面不得出现 Element Plus `No Data`，只显示“当前时间范围暂无服务器日志”；指标 `points=[]` 时不得渲染四个图表或缓存圆环，只显示“暂无指标数据”。补充 721-1300px 摘要两列、日志区横向滚动的浏览器视觉检查；本轮无后端接口或数据库变更。

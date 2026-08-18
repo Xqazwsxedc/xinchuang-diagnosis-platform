@@ -61,6 +61,8 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
         new PermissionRule("PUT", "/ledger/business-systems/*", "ledger:business:update"),
         new PermissionRule("DELETE", "/ledger/business-systems/*", "ledger:business:delete"),
         new PermissionRule("GET", "/ledger/db-resources/**", "ledger:visualization:view"),
+        new PermissionRule("PUT", "/ledger/db-resources/*/monitoring-config", "ledger:database:update"),
+        new PermissionRule("POST", "/ledger/db-resources/*/monitoring-config/test", "ledger:database:update"),
         new PermissionRule("POST", "/ledger/db-resources", "ledger:database:create"),
         new PermissionRule("PUT", "/ledger/db-resources/*", "ledger:database:update"),
         new PermissionRule("DELETE", "/ledger/db-resources/*", "ledger:database:delete"),

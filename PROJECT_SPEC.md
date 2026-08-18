@@ -11,12 +11,26 @@
 
 ### 1.0.3 Prometheus 指标接入（2026-08-17）
 
+### 1.0.4 数据库指标下载弹窗（2026-08-18）
+
+- 数据库资源详情的“下载指标”改为先打开原型风格下载弹窗，选择日期范围和 CPU/内存/缓存命中率后再下载。
+- 保留 `/ledger/db-resources/{id}/metrics/download` 及旧 `range` 参数兼容；新增 `startDate`、`endDate`、`metrics` 可选参数。日期按 Asia/Shanghai 自然日处理，最大跨度 90 天。
+- 后端指标编码采用白名单并按选择执行 Prometheus query_range，CSV 只包含所选指标列；空选择、非法日期和未知指标拒绝，仍执行导出审计和监控接入校验。
+
 - 数据库资源详情的 CPU、内存、磁盘 IOPS、MySQL 当前连接数、InnoDB 缓存命中率已改为 `Vue -> Spring Boot -> Prometheus HTTP API` 实时查询。原 `/api/ledger/db-resources/{id}/metrics` 与 CSV 下载路径保持不变，日志链路、台账 CRUD 和 MySQL 表结构不变。
 - 后端新增 `monitoring/prometheus` 配置、查询模板、HTTP 客户端、范围解析与安全响应解析；PromQL 集中管理。支持 `1H/3H/6H/12H/1D/3D/7D/14D`、即时卡片、区间趋势和 CSV 下载；`NaN/Inf`、空结果、非 success、网络/HTTP 异常会得到安全处理。
 - 前端详情页增加“当前连接数”卡片与趋势图，监控服务异常时只在指标区域提示，不将旧 `db_instance_metric` 演示数据伪装为实时数据。
 - `MONITORING_PROMETHEUS_*`、`MONITORING_TARGETS_*` 已加入 `application.yml`、开发环境导入白名单和部署模板。本机 `.env` 仅写入用户确认的单机 Docker `instance` 映射；基础地址仍需由用户在本机配置，不在源码、模板或文档中记录真实地址。
 - 修复：PromQL 的 `{instance=...}` 标签选择器曾被 Spring URI 模板错误解析为变量，导致数据库详情指标接口返回 HTTP 500 和“系统繁忙”。`PrometheusHttpClient` 已改为先对查询参数进行百分号编码再创建 URI，并增加带标签选择器的本地 HTTP 回归测试。
 - 本轮验证：后端 `mvn test` 92/92 通过（含 PromQL 标签选择器 URI 编码回归）；前端 `scripts/build-web.ps1` 通过。修复前的真实登录态指标接口已复现 HTTP 500；重新构建并重启部署后，同一资源的 `range=1D` 查询返回业务码 200、14 个趋势点及 CPU/当前连接数实时值，真实 HTTP 指标链路已通过该场景验收。
+
+### 1.0.4 Prometheus 监控接入流程调整
+
+- 旧的安装会话、一次性令牌、安装回调、安装命令生成和 exporter 安装入口已停用。
+- 当前阶段保留真实 Prometheus HTTP 指标链路、指标下载、日志、台账 CRUD、权限和审计能力。
+- 客户自配 Prometheus 资源级配置已实现：每个数据库资源独立保存 Prometheus 地址、凭据引用、数据库类型和 node/database 两组 selector；旧全局 target 不参与新查询，也不自动迁移。
+- MySQL 的 node selector 查询 CPU、内存、磁盘 IOPS，database selector 查询当前连接数和缓存命中率；配置保存、连接测试和详情页展示已闭环。
+- 已加入服务端 SSRF allowlist、精确 selector 校验、凭据脱敏和重定向禁止。部署环境必须显式配置允许的域名或 CIDR；真实 Prometheus 手工联调仍待执行。
 
 本项目目标是基于 Figma Make 原型，从零实现一个企业级可落地的“信创数据库智能故障诊断及修复平台”。
 
@@ -2535,3 +2549,4 @@ Vibe Coding 上下文维护约束：
 - 2026-08-13 完成 AI 性能优化知识库首轮专用页面改造：`/performance/knowledge` 已由通用 `AiModuleView.vue` 切换为 `OptimizationKnowledgeView.vue`，按原型实现知识 ID、名称、创建者、创建时间筛选，列表分页、编辑、删除、新增及新增/编辑抽屉。前端固定提交 `knowledgeType=OPTIMIZATION`，附件上传、保留、逻辑删除、图片预览和其他格式下载复用既有真实知识库链路；未新增表、文件存储机制或后端接口，`scripts/build-web.ps1` 通过。模块说明见 `docs/modules/ai-performance-optimization/knowledge-base.md`；登录态写操作与页面视觉验收待独立可写环境补验。
 - 2026-08-13 完成 AI 性能优化任务配置和建议页面专用化：`/performance/task` 切换为 `OptimizationTaskConfigView.vue`，固定 `PERFORMANCE_OPTIMIZATION` 任务类型，新增模型/对象/每日每周规则抽屉、`OPT-TASK-` 服务端编码及 `PENDING` 等待优化引擎执行语义；`/performance/suggestion` 切换为 `OptimizationSuggestionView.vue`，按原型实现建议 ID、任务名称、创建者、状态筛选，多选/全选、真实 CSV 导出和居中详情处理弹窗。`opt_report` 仍为唯一建议事实表，后端补任务名称、创建者筛选、创建者批量回填和最多 100 条导出校验审计，未改变既有接口语义或数据库结构。模块说明见 `docs/modules/ai-performance-optimization/task-config.md` 与 `suggestion-management.md`。
 - 2026-08-13 性能优化任务与建议最终验证：修复通用任务更新在前端不回传内部 `taskCode` 时会触发编码必填校验的问题，更新链路改为继承原编码；新增对应白盒回归。后端 `mvn test` 82/82 通过，前端 `scripts/build-web.ps1` 通过。构建仍只有既有第三方 Rollup/Sass 和大分包提示；登录态写入、建议导出和权限黑盒待独立可写环境补验。
+- 2026-08-18 修复数据库资源详情页空状态和中等宽度错位：日志为空时不挂载 Element Plus 表格，仅显示“当前时间范围暂无服务器日志”；指标无趋势点时仅显示“暂无指标数据”，不渲染四图和缓存圆环；721-1300px 下摘要/指标卡片改为两列，日志表由内容区横向滚动承载。仅涉及前端 `DbResourceDetailView.vue` 与文档上下文，后端、数据库、部署结构不变；待 `scripts/build-web.ps1` 验证。

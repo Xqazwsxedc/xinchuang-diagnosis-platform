@@ -6,4 +6,6 @@ import java.util.List;
 public interface PrometheusClient {
     List<PrometheusPoint> instantQuery(String promQl);
     List<PrometheusPoint> rangeQuery(String promQl, PrometheusRange range);
+    default List<PrometheusPoint> instantQuery(String baseUrl, String authRef, String promQl) { return instantQuery(promQl); }
+    default List<PrometheusPoint> rangeQuery(String baseUrl, String authRef, String promQl, PrometheusRange range) { return rangeQuery(promQl, range); }
 }

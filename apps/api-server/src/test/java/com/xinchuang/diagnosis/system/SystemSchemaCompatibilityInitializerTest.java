@@ -19,12 +19,15 @@ class SystemSchemaCompatibilityInitializerTest {
 
         new SystemSchemaCompatibilityInitializer(jdbcTemplate).run(new DefaultApplicationArguments());
 
-        verify(jdbcTemplate, times(5)).execute(any(String.class));
+        verify(jdbcTemplate, times(8)).execute(any(String.class));
         verify(jdbcTemplate).execute("ALTER TABLE sys_user ADD COLUMN avatar_url VARCHAR(500) NULL COMMENT '头像地址'");
         verify(jdbcTemplate).execute("ALTER TABLE sys_role ADD COLUMN data_scope VARCHAR(32) NOT NULL DEFAULT 'ALL' COMMENT '数据权限：ALL/DEPARTMENT/SELF/CUSTOM'");
         verify(jdbcTemplate).execute("ALTER TABLE sys_role ADD COLUMN data_scope_config VARCHAR(500) NULL COMMENT '自定义数据权限配置'");
         verify(jdbcTemplate).execute("ALTER TABLE kb_instance ADD COLUMN created_by BIGINT NULL");
         verify(jdbcTemplate).execute("ALTER TABLE kb_instance ADD COLUMN updated_by BIGINT NULL");
+        verify(jdbcTemplate).execute("ALTER TABLE ledger_db_resource ADD COLUMN monitor_status VARCHAR(32) NOT NULL DEFAULT 'PENDING' COMMENT '监控可用状态'");
+        verify(jdbcTemplate).execute("ALTER TABLE ledger_db_resource ADD COLUMN monitor_message VARCHAR(500) NULL COMMENT '监控接入说明或失败原因'");
+        verify(jdbcTemplate).execute("ALTER TABLE ledger_db_resource ADD COLUMN monitor_last_checked_at DATETIME NULL COMMENT '最近监控校验时间'");
     }
 
     @Test

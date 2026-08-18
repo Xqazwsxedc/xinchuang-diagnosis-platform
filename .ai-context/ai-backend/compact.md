@@ -91,3 +91,5 @@ mvn -DskipTests compile
 - 审计时间规则：`MybatisMetaObjectHandler.updateFill()` 必须强制覆盖实体中已有的 `updatedAt`。更新服务通常先读取实体，不能使用不会覆盖非空值的 `strictUpdateFill`，否则数据库和台账列表会错误保留创建/旧更新时间。
 - Prometheus 指标已接入：`monitoring/prometheus` 负责 `/api/v1/query`、`/api/v1/query_range`、配置化 PromQL、目标映射、范围/数值解析；`DbPrometheusMetricsService` 将五类指标转换为既有台账 DTO，`LedgerDetailServiceImpl` 仅负责资源校验、导出审计和 `PrometheusException -> BusinessException(503)`。不得让 Controller 或 Vue 拼 PromQL；不得将错误静默回退为 `db_instance_metric`。日志接口仍从 `db_instance_log` 查询。
 - 2026-08-17 运行时修复：`PrometheusHttpClient` 不得将带 `{instance=...}` 的 PromQL 直接交给 Spring URI 模板构造器，否则花括号会被当作变量而抛出 500。必须先百分号编码查询参数并以 `URI` 传入 `RestClient`；`PrometheusHttpClientTest` 必须保留该标签选择器回归场景。
+- 数据库资源接入管理第二阶段需求已导入。实施时必须优先兼容扩展 `ledger_db_resource`，统一 `PENDING/INSTALLING/VERIFYING/NORMAL/ABNORMAL` 状态；令牌只存哈希且只能在生成安装会话响应中返回一次明文。不得把 Docker IP、Prometheus instance、真实公网地址或数据库密码写入业务代码、日志或 DTO。
+- 2026-08-18 指标下载接口保留旧 `range` 兼容，并支持 `startDate/endDate/metrics`。日期由 `PrometheusRangeResolver` 按 Asia/Shanghai 自然日转换，最多 90 天；`metrics` 只允许 `cpuUsage/memoryUsage/cacheHitRate`，服务按白名单查询并生成对应 CSV 列。下载仍必须校验资源 `monitor_status=NORMAL`、写入导出审计，禁止回退演示指标。

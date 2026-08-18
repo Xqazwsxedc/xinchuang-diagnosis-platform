@@ -37,6 +37,7 @@
 - 2026-08-06 故障预测任务前后端兼容与布局修复未改变部署结构、端口或环境变量契约；正式开发/部署实例需重启后加载新 Jar 和前端静态资源。后端编译/测试、前端生产构建均通过。
 - Prometheus 接入已落地。开发 `scripts/_common.ps1` 与部署 `deploy/windows/_common.ps1` 都从未提交的 `.env` 读取 `MONITORING_PROMETHEUS_BASE_URL`、超时和目标映射；模板只保留 `REPLACE_*` 占位符，禁止提交真实地址、Docker IP、密码或密钥。当前本机 `.env` 已写单机目标映射，基础地址为空；填入后必须重启开发/部署后端，再验证详情指标、CSV 和 `/api/health`。
 - 2026-08-17 部署回归：本项目残留 Nginx 子进程曾持续占用 `80` 端口，导致部署启动脚本提前退出并保留旧页面。重启后 Nginx 监听 `80`、Spring Boot 监听 `18080`，`/api/health` 返回 200。Prometheus URI 修复已重新打包到部署 Jar，登录态 1D 指标接口经 Nginx 返回 200；后续每次修改该模块仍必须运行 `deploy/windows/build.ps1` 后重启，不可复用旧 Jar。
+- MySQL Docker Compose 监控安装包位于 `deploy/monitoring/mysql-node/`。它只面向后续 Ubuntu 手工验收：默认经配置的外部 Docker 网络连接容器 MySQL，端口只绑定 `127.0.0.1`，不调用平台 API、不自动注册 Prometheus。当前 Windows 工作站没有 Bash/Docker CLI，未执行 Shell 语法、Compose 渲染及容器验收；不得将其误报为已通过。
 
 必须先读：
 

@@ -16,6 +16,7 @@
 - `non-functional.md`：界面、安全、兼容性、数据准确性。
 - `database-design.md`：数据库设计说明书的可检索摘要；后续数据库开发必须严格对齐。
 - `prometheus-springboot-integration-prompt.md`：Prometheus 真实指标接入需求。已完成数据库资源详情的后端代理、配置化映射、五类指标、页面与 CSV 改造；真实环境联调仍需本机配置基础地址后执行。
+- `database-monitoring-onboarding-prompt.md`：数据库资源客户自配 Prometheus 接入需求。旧安装会话/令牌/回调流程已停用；资源级 Prometheus 配置、双 selector、服务端连接测试、SSRF 防护和详情页配置入口已实现，真实 Prometheus 端到端验收待执行。
 
 ## Requirement Status Rules
 

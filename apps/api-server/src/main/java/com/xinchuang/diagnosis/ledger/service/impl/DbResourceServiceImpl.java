@@ -9,14 +9,19 @@ import com.xinchuang.diagnosis.ledger.dto.LedgerPageQuery;
 import com.xinchuang.diagnosis.ledger.entity.BusinessSystem;
 import com.xinchuang.diagnosis.ledger.entity.BusinessSystemDb;
 import com.xinchuang.diagnosis.ledger.entity.DbResource;
+import com.xinchuang.diagnosis.ledger.entity.DbMonitoringConfig;
 import com.xinchuang.diagnosis.ledger.mapper.BusinessSystemDbMapper;
 import com.xinchuang.diagnosis.ledger.mapper.BusinessSystemMapper;
 import com.xinchuang.diagnosis.ledger.mapper.DbResourceMapper;
+import com.xinchuang.diagnosis.ledger.mapper.DbMonitoringConfigMapper;
 import com.xinchuang.diagnosis.ledger.service.DbResourceService;
 import com.xinchuang.diagnosis.ledger.vo.DbResourceVO;
 import com.xinchuang.diagnosis.system.service.AuditLogService;
 import com.xinchuang.diagnosis.system.service.NotificationService;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -24,17 +29,20 @@ import org.springframework.util.StringUtils;
 @Service
 public class DbResourceServiceImpl implements DbResourceService {
     private final DbResourceMapper dbResourceMapper;
+    private final DbMonitoringConfigMapper dbMonitoringConfigMapper;
     private final BusinessSystemMapper businessSystemMapper;
     private final BusinessSystemDbMapper businessSystemDbMapper;
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
 
     public DbResourceServiceImpl(DbResourceMapper dbResourceMapper,
+                                 DbMonitoringConfigMapper dbMonitoringConfigMapper,
                                  BusinessSystemMapper businessSystemMapper,
                                  BusinessSystemDbMapper businessSystemDbMapper,
                                  AuditLogService auditLogService,
                                  NotificationService notificationService) {
         this.dbResourceMapper = dbResourceMapper;
+        this.dbMonitoringConfigMapper = dbMonitoringConfigMapper;
         this.businessSystemMapper = businessSystemMapper;
         this.businessSystemDbMapper = businessSystemDbMapper;
         this.auditLogService = auditLogService;
@@ -46,7 +54,11 @@ public class DbResourceServiceImpl implements DbResourceService {
         LambdaQueryWrapper<DbResource> wrapper = buildQuery(query);
         wrapper.orderByDesc(DbResource::getUpdatedAt);
         Page<DbResource> page = dbResourceMapper.selectPage(new Page<>(query.getPageNo(), query.getPageSize()), wrapper);
-        List<DbResourceVO> records = page.getRecords().stream().map(this::toVO).toList();
+        List<DbResource> resources = page.getRecords();
+        Map<Long, DbMonitoringConfig> monitoringByResource = monitoringByResource(resources);
+        List<DbResourceVO> records = resources.stream()
+            .map(resource -> toVO(resource, monitoringByResource.get(resource.getId())))
+            .toList();
         return PageResponse.of(records, page.getTotal(), page.getCurrent(), page.getSize());
     }
 
@@ -56,7 +68,9 @@ public class DbResourceServiceImpl implements DbResourceService {
         if (entity == null) {
             throw new BusinessException("分布式数据库不存在");
         }
-        return toVO(entity);
+        return toVO(entity, dbMonitoringConfigMapper.selectOne(
+            new LambdaQueryWrapper<DbMonitoringConfig>().eq(DbMonitoringConfig::getResourceId, id)
+        ));
     }
 
     @Override
@@ -151,7 +165,17 @@ public class DbResourceServiceImpl implements DbResourceService {
         );
     }
 
-    private DbResourceVO toVO(DbResource entity) {
+    private Map<Long, DbMonitoringConfig> monitoringByResource(List<DbResource> resources) {
+        if (resources.isEmpty()) {
+            return Map.of();
+        }
+        List<Long> ids = resources.stream().map(DbResource::getId).toList();
+        return dbMonitoringConfigMapper.selectList(
+            new LambdaQueryWrapper<DbMonitoringConfig>().in(DbMonitoringConfig::getResourceId, ids)
+        ).stream().collect(Collectors.toMap(DbMonitoringConfig::getResourceId, Function.identity(), (first, ignored) -> first));
+    }
+
+    private DbResourceVO toVO(DbResource entity, DbMonitoringConfig monitoringConfig) {
         DbResourceVO vo = new DbResourceVO();
         vo.setId(entity.getId());
         vo.setName(entity.getName());
@@ -159,6 +183,8 @@ public class DbResourceServiceImpl implements DbResourceService {
         vo.setPrivateIp(entity.getPrivateIp());
         vo.setOwnerName(entity.getOwnerName());
         vo.setStatus(entity.getStatus());
+        vo.setMonitoringStatus(monitoringConfig != null && "HEALTHY".equals(monitoringConfig.getStatus())
+            ? "CONNECTED" : "NOT_CONNECTED");
         vo.setCreatedAt(entity.getCreatedAt());
         vo.setUpdatedAt(entity.getUpdatedAt());
         return vo;

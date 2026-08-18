@@ -10,11 +10,13 @@ import com.xinchuang.diagnosis.ledger.entity.BusinessDataRecord;
 import com.xinchuang.diagnosis.ledger.entity.BusinessSystem;
 import com.xinchuang.diagnosis.ledger.entity.DbInstanceLog;
 import com.xinchuang.diagnosis.ledger.entity.DbResource;
+import com.xinchuang.diagnosis.ledger.entity.DbMonitoringConfig;
 import com.xinchuang.diagnosis.ledger.entity.ReportExportLog;
 import com.xinchuang.diagnosis.ledger.mapper.BusinessDataRecordMapper;
 import com.xinchuang.diagnosis.ledger.mapper.BusinessSystemMapper;
 import com.xinchuang.diagnosis.ledger.mapper.DbInstanceLogMapper;
 import com.xinchuang.diagnosis.ledger.mapper.DbResourceMapper;
+import com.xinchuang.diagnosis.ledger.mapper.DbMonitoringConfigMapper;
 import com.xinchuang.diagnosis.ledger.mapper.ReportExportLogMapper;
 import com.xinchuang.diagnosis.ledger.service.LedgerDetailService;
 import com.xinchuang.diagnosis.ledger.vo.BusinessDataRecordVO;
@@ -23,12 +25,21 @@ import com.xinchuang.diagnosis.ledger.vo.DbMetricsOverviewVO;
 import com.xinchuang.diagnosis.ledger.vo.LedgerDownload;
 import com.xinchuang.diagnosis.monitoring.prometheus.DbPrometheusMetricsService;
 import com.xinchuang.diagnosis.monitoring.prometheus.PrometheusException;
+import com.xinchuang.diagnosis.monitoring.prometheus.PrometheusRange;
+import com.xinchuang.diagnosis.monitoring.prometheus.PrometheusRangeResolver;
 import com.xinchuang.diagnosis.security.LoginUser;
 import com.xinchuang.diagnosis.security.UserContext;
 import com.xinchuang.diagnosis.system.service.AuditLogService;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.List;
+import java.util.Map;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -37,26 +48,35 @@ import org.springframework.util.StringUtils;
 public class LedgerDetailServiceImpl implements LedgerDetailService {
     private final BusinessSystemMapper businessSystemMapper;
     private final DbResourceMapper dbResourceMapper;
+    private final DbMonitoringConfigMapper monitoringConfigMapper;
+    private final ObjectMapper objectMapper;
     private final BusinessDataRecordMapper businessDataRecordMapper;
     private final DbInstanceLogMapper dbInstanceLogMapper;
     private final ReportExportLogMapper reportExportLogMapper;
     private final AuditLogService auditLogService;
     private final DbPrometheusMetricsService prometheusMetricsService;
+    private final PrometheusRangeResolver prometheusRangeResolver;
 
     public LedgerDetailServiceImpl(BusinessSystemMapper businessSystemMapper,
                                    DbResourceMapper dbResourceMapper,
+                                   DbMonitoringConfigMapper monitoringConfigMapper,
+                                   ObjectMapper objectMapper,
                                    BusinessDataRecordMapper businessDataRecordMapper,
                                    DbInstanceLogMapper dbInstanceLogMapper,
                                    ReportExportLogMapper reportExportLogMapper,
                                    AuditLogService auditLogService,
-                                   DbPrometheusMetricsService prometheusMetricsService) {
+                                   DbPrometheusMetricsService prometheusMetricsService,
+                                   PrometheusRangeResolver prometheusRangeResolver) {
         this.businessSystemMapper = businessSystemMapper;
         this.dbResourceMapper = dbResourceMapper;
+        this.monitoringConfigMapper = monitoringConfigMapper;
+        this.objectMapper = objectMapper;
         this.businessDataRecordMapper = businessDataRecordMapper;
         this.dbInstanceLogMapper = dbInstanceLogMapper;
         this.reportExportLogMapper = reportExportLogMapper;
         this.auditLogService = auditLogService;
         this.prometheusMetricsService = prometheusMetricsService;
+        this.prometheusRangeResolver = prometheusRangeResolver;
     }
 
     @Override
@@ -72,8 +92,9 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
 
     @Override
     public DbMetricsOverviewVO dbMetrics(Long dbResourceId, DbMetricRangeQuery query) {
-        requireDbResource(dbResourceId);
-        return loadPrometheusMetrics(query.getRange());
+        DbResource resource = requireDbResource(dbResourceId);
+        DbMonitoringConfig config = requireHealthyMonitoring(resource);
+        return loadPrometheusMetrics(config, query.getRange(), Set.of("cpuUsage", "memoryUsage", "diskIops", "currentConnections", "cacheHitRate"));
     }
 
     @Override
@@ -120,19 +141,32 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
     @Transactional(rollbackFor = Exception.class)
     public LedgerDownload downloadDbMetrics(Long dbResourceId, DbMetricRangeQuery query) {
         DbResource resource = requireDbResource(dbResourceId);
-        DbMetricsOverviewVO overview = loadPrometheusMetrics(query.getRange());
+        DbMonitoringConfig config = requireHealthyMonitoring(resource);
+        Set<String> metricCodes = parseMetricCodes(query.getMetrics());
+        PrometheusRange selectedRange = resolveDownloadRange(query);
+        if (selectedRange == null) {
+            selectedRange = prometheusRangeResolver.resolve(query.getRange(), Instant.now());
+        }
+        DbMetricsOverviewVO overview = loadPrometheusMetrics(config, selectedRange, metricCodes);
         if (overview.getPoints().isEmpty()) {
             throw new BusinessException("当前时间范围暂无指标数据");
         }
-        String fileName = "db-metrics-" + dbResourceId + "-" + query.getRange() + ".csv";
-        StringBuilder csv = new StringBuilder("采样时间,CPU利用率(%),内存使用占比(%),磁盘IOPS,当前连接数,缓存命中率(%)\n");
+        String fileName = "db-metrics-" + dbResourceId + "-" + (query.getStartDate() != null ? query.getStartDate() : query.getRange()) + ".csv";
+        StringBuilder csv = new StringBuilder("采样时间");
+        if (metricCodes.contains("cpuUsage")) csv.append(",CPU利用率(%)");
+        if (metricCodes.contains("memoryUsage")) csv.append(",内存使用占比(%)");
+        if (metricCodes.contains("diskIops")) csv.append(",磁盘IOPS");
+        if (metricCodes.contains("currentConnections")) csv.append(",当前连接数");
+        if (metricCodes.contains("cacheHitRate")) csv.append(",缓存命中率(%)");
+        csv.append('\n');
         for (var point : overview.getPoints()) {
-            csv.append(point.getSampledAt()).append(',')
-                .append(value(point.getCpuUsage())).append(',')
-                .append(value(point.getMemoryUsage())).append(',')
-                .append(value(point.getDiskIops())).append(',')
-                .append(value(point.getCurrentConnections())).append(',')
-                .append(value(point.getCacheHitRate())).append('\n');
+            csv.append(point.getSampledAt());
+            if (metricCodes.contains("cpuUsage")) csv.append(',').append(value(point.getCpuUsage()));
+            if (metricCodes.contains("memoryUsage")) csv.append(',').append(value(point.getMemoryUsage()));
+            if (metricCodes.contains("diskIops")) csv.append(',').append(value(point.getDiskIops()));
+            if (metricCodes.contains("currentConnections")) csv.append(',').append(value(point.getCurrentConnections()));
+            if (metricCodes.contains("cacheHitRate")) csv.append(',').append(value(point.getCacheHitRate()));
+            csv.append('\n');
         }
         recordExport("DB_METRICS", dbResourceId, fileName, "下载数据库指标：" + resource.getName());
         return csvDownload(fileName, csv);
@@ -193,6 +227,60 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
         }
     }
 
+    private DbMetricsOverviewVO loadPrometheusMetrics(PrometheusRange range, Set<String> metricCodes) {
+        try {
+            return prometheusMetricsService.load(range, metricCodes);
+        } catch (PrometheusException exception) {
+            throw new BusinessException(503, exception.getMessage());
+        }
+    }
+
+    private DbMetricsOverviewVO loadPrometheusMetrics(DbMonitoringConfig config, String range, Set<String> metricCodes) {
+        try {
+            return prometheusMetricsService.load(prometheusRangeResolver.resolve(range, Instant.now()), metricCodes, config.getPrometheusBaseUrl(), config.getPrometheusAuthRef(),
+                selector(config.getNodeTargetSelector()), selector(config.getDatabaseTargetSelector()));
+        } catch (PrometheusException exception) {
+            throw new BusinessException(503, exception.getMessage());
+        }
+    }
+
+    private DbMetricsOverviewVO loadPrometheusMetrics(DbMonitoringConfig config, PrometheusRange range, Set<String> metricCodes) {
+        try {
+            return prometheusMetricsService.load(range, metricCodes, config.getPrometheusBaseUrl(), config.getPrometheusAuthRef(),
+                selector(config.getNodeTargetSelector()), selector(config.getDatabaseTargetSelector()));
+        } catch (PrometheusException exception) {
+            throw new BusinessException(503, exception.getMessage());
+        }
+    }
+
+    private Map<String, String> selector(String value) {
+        try { return objectMapper.readValue(value, new TypeReference<Map<String, String>>() { }); }
+        catch (Exception ex) { throw new BusinessException(503, "监控配置损坏，请重新保存"); }
+    }
+
+    private PrometheusRange resolveDownloadRange(DbMetricRangeQuery query) {
+        if ((query.getStartDate() == null) != (query.getEndDate() == null)) {
+            throw new BusinessException("开始日期和结束日期必须同时填写");
+        }
+        if (query.getStartDate() != null) {
+            return prometheusRangeResolver.resolve(query.getStartDate(), query.getEndDate());
+        }
+        return null;
+    }
+
+    private Set<String> parseMetricCodes(String value) {
+        if (!StringUtils.hasText(value)) {
+            throw new BusinessException("至少选择一项指标");
+        }
+        Set<String> allowed = Set.of("cpuUsage", "memoryUsage", "cacheHitRate");
+        Set<String> selected = new LinkedHashSet<>(Arrays.stream(value.split(","))
+            .map(String::trim).filter(StringUtils::hasText).toList());
+        if (selected.isEmpty() || !allowed.containsAll(selected)) {
+            throw new BusinessException("指标选择不合法");
+        }
+        return selected;
+    }
+
     private BusinessSystem requireBusinessSystem(Long id) {
         BusinessSystem businessSystem = businessSystemMapper.selectById(id);
         if (businessSystem == null) {
@@ -207,6 +295,15 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
             throw new BusinessException("分布式数据库不存在");
         }
         return resource;
+    }
+
+    private DbMonitoringConfig requireHealthyMonitoring(DbResource resource) {
+        DbMonitoringConfig config = monitoringConfigMapper.selectOne(new LambdaQueryWrapper<DbMonitoringConfig>()
+            .eq(DbMonitoringConfig::getResourceId, resource.getId()));
+        if (config == null || !"HEALTHY".equals(config.getStatus()) || !"NORMAL".equals(resource.getMonitorStatus())) {
+            throw new BusinessException(409, "当前数据库监控尚未通过连接测试，暂无真实指标数据");
+        }
+        return config;
     }
 
     private LocalDateTime rangeStart(String range) {

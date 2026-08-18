@@ -34,8 +34,20 @@ export interface DbResourceItem {
   privateIp?: string
   ownerName: string
   status: LedgerStatus
+  monitoringStatus?: 'CONNECTED' | 'NOT_CONNECTED'
   createdAt?: string
   updatedAt?: string
+}
+
+export interface DbMonitoringConfig {
+  prometheusBaseUrl?: string
+  credentialsConfigured?: boolean
+  nodeTargetSelector?: Record<string, string>
+  databaseTargetSelector?: Record<string, string>
+  databaseType?: string
+  status: 'UNCONFIGURED' | 'TESTING' | 'HEALTHY' | 'ABNORMAL'
+  lastCheckedAt?: string
+  lastErrorMessage?: string
 }
 
 export interface BusinessSystemPayload {
@@ -139,6 +151,24 @@ export function updateDbResource(id: string, data: DbResourcePayload) {
 
 export function deleteDbResource(id: string) {
   return http.delete(`/ledger/db-resources/${id}`) as unknown as Promise<void>
+}
+
+export function getDbMonitoringConfig(id: string) {
+  return http.get(`/ledger/db-resources/${id}/monitoring-config`) as unknown as Promise<DbMonitoringConfig>
+}
+
+export function saveDbMonitoringConfig(id: string, data: {
+  prometheusBaseUrl: string
+  prometheusAuthRef?: string
+  nodeTargetSelector: Record<string, string>
+  databaseTargetSelector: Record<string, string>
+  databaseType: string
+}) {
+  return http.put(`/ledger/db-resources/${id}/monitoring-config`, data) as unknown as Promise<DbMonitoringConfig>
+}
+
+export function testDbMonitoringConfig(id: string) {
+  return http.post(`/ledger/db-resources/${id}/monitoring-config/test`) as unknown as Promise<DbMonitoringConfig>
 }
 
 export function getDbMetrics(id: string, range: MetricRange) {
