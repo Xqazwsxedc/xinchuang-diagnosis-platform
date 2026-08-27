@@ -11,6 +11,7 @@ import com.xinchuang.diagnosis.common.exception.BusinessException;
 import com.xinchuang.diagnosis.ledger.entity.DbResource;
 import com.xinchuang.diagnosis.ledger.mapper.BusinessSystemDbMapper;
 import com.xinchuang.diagnosis.ledger.mapper.BusinessSystemMapper;
+import com.xinchuang.diagnosis.ledger.mapper.DbMonitoringConfigMapper;
 import com.xinchuang.diagnosis.ledger.mapper.DbResourceMapper;
 import com.xinchuang.diagnosis.system.service.AuditLogService;
 import com.xinchuang.diagnosis.system.service.NotificationService;
@@ -25,6 +26,8 @@ class DbResourceServiceImplV2Test {
     @Mock
     private DbResourceMapper dbResourceMapper;
     @Mock
+    private DbMonitoringConfigMapper dbMonitoringConfigMapper;
+    @Mock
     private BusinessSystemMapper businessSystemMapper;
     @Mock
     private BusinessSystemDbMapper businessSystemDbMapper;
@@ -37,8 +40,8 @@ class DbResourceServiceImplV2Test {
 
     @BeforeEach
     void setUp() {
-        service = new DbResourceServiceImpl(dbResourceMapper, businessSystemMapper, businessSystemDbMapper,
-            auditLogService, notificationService);
+        service = new DbResourceServiceImpl(dbResourceMapper, dbMonitoringConfigMapper, businessSystemMapper,
+            businessSystemDbMapper, auditLogService, notificationService);
     }
 
     @Test

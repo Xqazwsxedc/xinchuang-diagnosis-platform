@@ -14,6 +14,7 @@ import com.xinchuang.diagnosis.ai.dto.FaultTaskExecutionUpdateRequest;
 import com.xinchuang.diagnosis.ai.dto.FaultTaskSaveRequest;
 import com.xinchuang.diagnosis.ai.entity.AiTask;
 import com.xinchuang.diagnosis.ai.entity.TaskExecRecord;
+import com.xinchuang.diagnosis.ai.mapper.FaultReportMapper;
 import com.xinchuang.diagnosis.ai.mapper.TaskExecRecordMapper;
 import com.xinchuang.diagnosis.ai.service.AiManagementService;
 import com.xinchuang.diagnosis.common.exception.BusinessException;
@@ -34,10 +35,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class FaultPredictionTaskServiceImplTest {
     @Mock private AiManagementService aiManagementService;
     @Mock private TaskExecRecordMapper taskExecRecordMapper;
+    @Mock private FaultReportMapper faultReportMapper;
     private FaultPredictionTaskServiceImpl service;
 
     @BeforeEach
-    void setUp() { service = new FaultPredictionTaskServiceImpl(aiManagementService, taskExecRecordMapper, new ObjectMapper()); }
+    void setUp() { service = new FaultPredictionTaskServiceImpl(aiManagementService, taskExecRecordMapper, faultReportMapper, new ObjectMapper()); }
 
     @Test
     /** AI 引擎回调不能修改其他任务所属的执行记录。 */

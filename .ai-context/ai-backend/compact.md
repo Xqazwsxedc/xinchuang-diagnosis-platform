@@ -93,3 +93,4 @@ mvn -DskipTests compile
 - 2026-08-17 运行时修复：`PrometheusHttpClient` 不得将带 `{instance=...}` 的 PromQL 直接交给 Spring URI 模板构造器，否则花括号会被当作变量而抛出 500。必须先百分号编码查询参数并以 `URI` 传入 `RestClient`；`PrometheusHttpClientTest` 必须保留该标签选择器回归场景。
 - 数据库资源接入管理第二阶段需求已导入。实施时必须优先兼容扩展 `ledger_db_resource`，统一 `PENDING/INSTALLING/VERIFYING/NORMAL/ABNORMAL` 状态；令牌只存哈希且只能在生成安装会话响应中返回一次明文。不得把 Docker IP、Prometheus instance、真实公网地址或数据库密码写入业务代码、日志或 DTO。
 - 2026-08-18 指标下载接口保留旧 `range` 兼容，并支持 `startDate/endDate/metrics`。日期由 `PrometheusRangeResolver` 按 Asia/Shanghai 自然日转换，最多 90 天；`metrics` 只允许 `cpuUsage/memoryUsage/cacheHitRate`，服务按白名单查询并生成对应 CSV 列。下载仍必须校验资源 `monitor_status=NORMAL`、写入导出审计，禁止回退演示指标。
+- 2026-08-21 新增技术交流文档 `docs/tech-sharing/AI故障预测调用流程与API服务技术交流.md`，其中的 Controller、Service、执行受理和未来引擎状态更新示例必须与现有实现保持一致；交流时必须明确真实模型 HTTP 调用、调度器和公开引擎回调尚未接入。

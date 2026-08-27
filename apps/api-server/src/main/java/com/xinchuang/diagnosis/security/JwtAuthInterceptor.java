@@ -28,6 +28,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
         new PermissionRule("GET", "/ai/tasks/executions", "ai:task:view"),
         new PermissionRule("GET", "/ai/fault-prediction/tasks", "ai:task:view"),
         new PermissionRule("GET", "/ai/fault-prediction/tasks/**", "ai:task:view"),
+        new PermissionRule("POST", "/ai/fault-prediction/engine/verify", "ai:task:execute"),
         new PermissionRule("POST", "/ai/fault-prediction/tasks/*/execute", "ai:task:execute"),
         new PermissionRule("POST", "/ai/fault-prediction/tasks", "ai:task:create"),
         new PermissionRule("PUT", "/ai/fault-prediction/tasks/*", "ai:task:update"),

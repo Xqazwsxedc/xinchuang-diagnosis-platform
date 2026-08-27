@@ -10,6 +10,9 @@ Thumbs.db
 apps/api-server/target/
 apps/api-server/data/knowledge-files/
 *.class
+apps/model-server/.venv/
+apps/model-server/__pycache__/
+apps/model-server/.bentoml/
 
 # Frontend
 apps/admin-web/node_modules/

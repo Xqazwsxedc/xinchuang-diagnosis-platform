@@ -1,5 +1,7 @@
 # AI Project Manager Compact
 
+- 2026-08-21 技术交流材料新增两张可导入 Figma 的 SVG：`docs/diagrams/ai-fault-prediction-flow-figma.svg` 说明故障预测闭环，`docs/diagrams/ai-api-layered-flow-figma.svg` 说明 API 分层链路；新增 `docs/tech-sharing/AI故障预测调用流程与API服务技术交流.md`，提供调用流程、模块划分、API 契约、真实代码示例与后续引擎适配建议。交流表述必须区分平台已实现的任务/执行/结果/处置闭环与尚未接入的真实模型推理、调度和引擎 HTTP 回调。
+
 职责：维护项目范围、需求上下文、模块边界、验收清单和跨角色交接。
 
 当前阶段：已完成企业级 Vibe Coding 上下文、Windows 本机部署和测试 2.0 基线。后续任务必须由项目经理视角确认影响角色、验收范围和文档收口。

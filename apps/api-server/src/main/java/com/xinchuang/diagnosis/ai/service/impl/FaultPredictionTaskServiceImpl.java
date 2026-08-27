@@ -10,7 +10,9 @@ import com.xinchuang.diagnosis.ai.dto.FaultTaskPageQuery;
 import com.xinchuang.diagnosis.ai.dto.FaultTaskSaveRequest;
 import com.xinchuang.diagnosis.ai.dto.TaskExecuteRequest;
 import com.xinchuang.diagnosis.ai.entity.AiTask;
+import com.xinchuang.diagnosis.ai.entity.FaultReport;
 import com.xinchuang.diagnosis.ai.entity.TaskExecRecord;
+import com.xinchuang.diagnosis.ai.mapper.FaultReportMapper;
 import com.xinchuang.diagnosis.ai.mapper.TaskExecRecordMapper;
 import com.xinchuang.diagnosis.ai.service.AiManagementService;
 import com.xinchuang.diagnosis.ai.service.FaultPredictionTaskService;
@@ -27,12 +29,14 @@ public class FaultPredictionTaskServiceImpl implements FaultPredictionTaskServic
     private static final String TASK_TYPE = "FAULT_PREDICTION";
     private final AiManagementService aiManagementService;
     private final TaskExecRecordMapper taskExecRecordMapper;
+    private final FaultReportMapper faultReportMapper;
     private final ObjectMapper objectMapper;
 
     public FaultPredictionTaskServiceImpl(AiManagementService aiManagementService,
-                                          TaskExecRecordMapper taskExecRecordMapper, ObjectMapper objectMapper) {
+                                          TaskExecRecordMapper taskExecRecordMapper, FaultReportMapper faultReportMapper, ObjectMapper objectMapper) {
         this.aiManagementService = aiManagementService;
         this.taskExecRecordMapper = taskExecRecordMapper;
+        this.faultReportMapper = faultReportMapper;
         this.objectMapper = objectMapper;
     }
 
@@ -51,7 +55,9 @@ public class FaultPredictionTaskServiceImpl implements FaultPredictionTaskServic
         AiTask task = faultTask(id);
         Page<TaskExecRecord> page = taskExecRecordMapper.selectPage(new Page<>(1, 10), new LambdaQueryWrapper<TaskExecRecord>()
             .eq(TaskExecRecord::getTaskId, id).orderByDesc(TaskExecRecord::getStartTime));
-        return FaultTaskDetailVO.from(task, page.getRecords());
+        List<FaultReport> faultReports = faultReportMapper.selectList(new LambdaQueryWrapper<FaultReport>()
+            .eq(FaultReport::getTaskId, id).orderByDesc(FaultReport::getAlertTime));
+        return FaultTaskDetailVO.from(task, page.getRecords(), faultReports);
     }
 
     @Override

@@ -44,6 +44,7 @@
 - `apps/api-server/src/main/java/com/xinchuang/diagnosis/ai/service/FaultKnowledgeService.java`：故障知识库业务、附件逻辑删除和审计。
 - `apps/api-server/src/main/java/com/xinchuang/diagnosis/ai/service/KnowledgeFileStorageService.java`：本地附件安全存储与读取。
 - `docs/modules/ai-fault-prediction/knowledge-base.md`：故障知识库模块说明。
+- `docs/tech-sharing/AI故障预测调用流程与API服务技术交流.md`：AI 故障预测调用流程、模块划分、API 契约和核心代码示例。
 - `scripts/_common.ps1`：统一开发环境、工具路径与本机运行环境变量加载；`scripts/dev-api.ps1` 必须在启动前调用其本机环境加载函数。
 
 企业级上下文目录：

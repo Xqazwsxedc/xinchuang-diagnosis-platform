@@ -150,6 +150,16 @@ export interface FaultTaskItem extends Omit<AiTaskItem, 'taskType' | 'metricCode
 
 export interface FaultTaskDetail extends FaultTaskItem {
   executionRecords: TaskExecRecordItem[]
+  faultReports: FaultTaskReportItem[]
+}
+
+export interface FaultTaskReportItem {
+  id: string
+  reportCode: string
+  executionId?: string
+  alertTime?: string
+  faultType?: string
+  processStatus?: ProcessStatus
 }
 
 export interface OptimizationTaskSchedule {

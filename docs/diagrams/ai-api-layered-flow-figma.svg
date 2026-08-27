@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="760" viewBox="0 0 1180 760">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#e8e8e8"/></marker>
+    <style>
+      text{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;letter-spacing:0}.title{font-size:26px;font-weight:700;fill:#fff}.sub{font-size:14px;fill:#b9b9b9}.layer{font-size:19px;font-weight:700;fill:#fff}.body{font-size:15px;fill:#ededed}.small{font-size:13px;fill:#bdbdbd}.mono{font-family:Consolas,monospace;font-size:14px;fill:#fff}.box{fill:#292929;stroke:#5c5c5c;stroke-width:1}.blue{fill:#30343a;stroke:#8aaeff;stroke-width:1}.db{fill:#292929;stroke:#c9a35b;stroke-width:1}.line{stroke:#d8d8d8;stroke-width:1.6;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1180" height="760" fill="#1f1f1f"/>
+  <text x="590" y="48" text-anchor="middle" class="title">AI 故障预测 API 服务分层调用流程</text>
+  <text x="590" y="75" text-anchor="middle" class="sub">请求进入、业务校验、持久化和统一响应</text>
+
+  <rect x="45" y="120" width="220" height="470" rx="6" class="blue"/>
+  <text x="155" y="158" text-anchor="middle" class="layer">Vue 前端</text>
+  <text x="155" y="198" text-anchor="middle" class="body">任务配置页面</text>
+  <text x="155" y="232" text-anchor="middle" class="body">预警列表与详情</text>
+  <text x="155" y="266" text-anchor="middle" class="body">权限控制与提示</text>
+  <line x1="155" y1="310" x2="155" y2="355" class="line"/>
+  <text x="155" y="390" text-anchor="middle" class="mono">Axios</text>
+  <text x="155" y="428" text-anchor="middle" class="small">Bearer JWT</text>
+  <text x="155" y="460" text-anchor="middle" class="small">JSON / Blob</text>
+
+  <rect x="300" y="120" width="220" height="470" rx="6" class="box"/>
+  <text x="410" y="158" text-anchor="middle" class="layer">Controller 接口层</text>
+  <text x="410" y="205" text-anchor="middle" class="mono">/ai/fault-prediction</text>
+  <text x="410" y="230" text-anchor="middle" class="mono">/tasks</text>
+  <text x="410" y="276" text-anchor="middle" class="body">接收请求</text>
+  <text x="410" y="308" text-anchor="middle" class="body">@Valid 参数校验</text>
+  <text x="410" y="340" text-anchor="middle" class="body">统一 ApiResponse</text>
+  <text x="410" y="386" text-anchor="middle" class="small">不直接操作数据库</text>
+  <text x="410" y="430" text-anchor="middle" class="small">不编写算法逻辑</text>
+
+  <rect x="555" y="120" width="220" height="470" rx="6" class="box"/>
+  <text x="665" y="158" text-anchor="middle" class="layer">Service 业务层</text>
+  <text x="665" y="205" text-anchor="middle" class="body">任务类型校验</text>
+  <text x="665" y="237" text-anchor="middle" class="body">模型与对象校验</text>
+  <text x="665" y="269" text-anchor="middle" class="body">权限与审计</text>
+  <text x="665" y="301" text-anchor="middle" class="body">执行记录创建</text>
+  <text x="665" y="333" text-anchor="middle" class="body">结果状态流转</text>
+  <line x1="665" y1="366" x2="665" y2="411" class="line"/>
+  <text x="665" y="446" text-anchor="middle" class="mono">PENDING → RUNNING</text>
+  <text x="665" y="475" text-anchor="middle" class="mono">→ SUCCESS / FAILED</text>
+
+  <rect x="810" y="120" width="150" height="470" rx="6" class="box"/>
+  <text x="885" y="158" text-anchor="middle" class="layer">Mapper</text>
+  <text x="885" y="198" text-anchor="middle" class="body">AiTaskMapper</text>
+  <text x="885" y="230" text-anchor="middle" class="body">TaskExecRecord</text>
+  <text x="885" y="262" text-anchor="middle" class="body">FaultReport</text>
+  <text x="885" y="294" text-anchor="middle" class="body">ResultStatusLog</text>
+  <text x="885" y="360" text-anchor="middle" class="small">MyBatis-Plus</text>
+  <text x="885" y="392" text-anchor="middle" class="small">事务边界</text>
+
+  <rect x="995" y="120" width="140" height="470" rx="6" class="db"/>
+  <text x="1065" y="158" text-anchor="middle" class="layer">MySQL</text>
+  <text x="1065" y="210" text-anchor="middle" class="mono">ai_task</text>
+  <text x="1065" y="242" text-anchor="middle" class="mono">task_exec_record</text>
+  <text x="1065" y="274" text-anchor="middle" class="mono">fault_report</text>
+  <text x="1065" y="306" text-anchor="middle" class="mono">ai_model</text>
+  <text x="1065" y="370" text-anchor="middle" class="small">审计记录</text>
+  <text x="1065" y="402" text-anchor="middle" class="small">历史快照</text>
+
+  <line x1="265" y1="355" x2="300" y2="355" class="line"/>
+  <line x1="520" y1="355" x2="555" y2="355" class="line"/>
+  <line x1="775" y1="355" x2="810" y2="355" class="line"/>
+  <line x1="960" y1="355" x2="995" y2="355" class="line"/>
+  <text x="590" y="680" text-anchor="middle" class="small">统一响应：code / message / data；异常由全局异常处理器转换为 400、401、403、404、500</text>
+</svg>

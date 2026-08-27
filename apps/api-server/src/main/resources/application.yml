@@ -65,3 +65,10 @@ monitoring:
   targets:
     node-instance: ${MONITORING_TARGETS_NODE_INSTANCE:}
     mysql-instance: ${MONITORING_TARGETS_MYSQL_INSTANCE:}
+
+ai:
+  engine:
+    bentoml:
+      base-url: ${AI_ENGINE_BENTOML_BASE_URL:http://127.0.0.1:3000}
+      connect-timeout: ${AI_ENGINE_BENTOML_CONNECT_TIMEOUT:3s}
+      read-timeout: ${AI_ENGINE_BENTOML_READ_TIMEOUT:30s}

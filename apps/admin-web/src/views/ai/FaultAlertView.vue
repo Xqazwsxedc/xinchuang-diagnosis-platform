@@ -7,6 +7,11 @@
       </div>
     </div>
 
+    <div v-if="faultIdFilter" class="fault-id-filter">
+      <span>已按故障 ID 筛选：</span><strong>{{ faultIdFilter }}</strong>
+      <el-button link type="primary" @click="clearFaultIdFilter">清除筛选</el-button>
+    </div>
+
     <el-card shadow="never" class="filter-card">
       <el-form :inline="true" :model="query" class="alert-filter">
         <el-form-item label="故障ID/对象">
@@ -153,12 +158,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, reactive, ref } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { Delete, RefreshLeft, Search, View } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { deleteFaultAlert, getFaultAlertDetail, getFaultAlerts, handleFaultAlert, type FaultAlertDetail, type FaultAlertItem, type FaultAlertQuery, type FaultAlertStatus } from '@/api/modules/ai'
 import { useUserStore } from '@/stores/user'
+import { useRoute, useRouter } from 'vue-router'
 
+const route = useRoute()
+const router = useRouter()
 const userStore = useUserStore()
 const loading = ref(false)
 const records = ref<FaultAlertItem[]>([])
@@ -167,6 +175,7 @@ const detailVisible = ref(false)
 const total = ref(0)
 const query = reactive<FaultAlertQuery>({ pageNo: 1, pageSize: 10, keyword: '', processStatus: undefined, riskLevel: undefined, targetType: undefined })
 const canDelete = computed(() => userStore.hasPermission('ai:fault:delete'))
+const faultIdFilter = computed(() => typeof route.query.faultId === 'string' ? route.query.faultId.trim() : '')
 
 const trend = computed(() => {
   if (!detail.value?.trendJson) return []
@@ -186,6 +195,10 @@ const trendDots = computed(() => {
 const trendPoints = computed(() => trendDots.value.map((point) => `${point.x},${point.y}`).join(' '))
 const trendGrid = [{ y: 28, label: '95' }, { y: 69, label: '89' }, { y: 110, label: '83' }, { y: 151, label: '78' }]
 
+function applyFaultIdFilter() {
+  query.keyword = faultIdFilter.value
+  query.pageNo = 1
+}
 async function loadData() {
   loading.value = true
   try {
@@ -195,7 +208,8 @@ async function loadData() {
   } finally { loading.value = false }
 }
 function search() { query.pageNo = 1; loadData() }
-function reset() { query.keyword = ''; query.processStatus = undefined; query.riskLevel = undefined; query.targetType = undefined; query.pageNo = 1; loadData() }
+function reset() { query.keyword = ''; query.processStatus = undefined; query.riskLevel = undefined; query.targetType = undefined; query.pageNo = 1; router.replace({ query: {} }); loadData() }
+function clearFaultIdFilter() { router.replace({ query: {} }) }
 async function openDetail(id: string) {
   detail.value = await getFaultAlertDetail(id)
   detailVisible.value = true
@@ -232,11 +246,13 @@ function canTransition(nextStatus: FaultAlertStatus) {
     || (detail.value.processStatus === 'CONFIRMED' && nextStatus === 'CLOSED')
 }
 
-onMounted(loadData)
+watch(faultIdFilter, () => { applyFaultIdFilter(); loadData() })
+onMounted(() => { applyFaultIdFilter(); loadData() })
 </script>
 
 <style scoped>
 .alert-page :deep(.el-card) { border-radius: 8px; }
+.fault-id-filter { display: flex; align-items: center; gap: 8px; min-height: 44px; margin-bottom: 16px; padding: 0 14px; border: 1px solid #bfd0fb; border-radius: 8px; background: #f3f6ff; color: #2857b7; font-size: 14px; }
 .alert-filter :deep(.el-form-item) { margin-bottom: 0; }
 .table-card { min-height: 520px; }
 .pagination-wrap { display: flex; justify-content: flex-end; margin-top: 20px; }

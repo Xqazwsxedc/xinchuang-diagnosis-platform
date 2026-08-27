@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="1420" viewBox="0 0 760 1420">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#e8e8e8"/></marker>
+    <style>
+      text{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;letter-spacing:0}.title{font-size:25px;font-weight:700;fill:#fff}.sub{font-size:14px;fill:#b9b9b9}.label{font-size:16px;fill:#f2f2f2}.small{font-size:13px;fill:#bdbdbd}.mono{font-family:Consolas,monospace;font-size:15px;fill:#fff}.tag{font-size:12px;font-weight:700;fill:#262626}.box{fill:#272727;stroke:#555;stroke-width:1}.accent{fill:#333;stroke:#8aaeff;stroke-width:1}.data{fill:#292929;stroke:#777;stroke-width:1}.line{stroke:#d8d8d8;stroke-width:1.5;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="760" height="1420" fill="#1f1f1f"/>
+  <text x="380" y="48" text-anchor="middle" class="title">AI 故障预测调用流程</text>
+  <text x="380" y="75" text-anchor="middle" class="sub">平台侧任务编排与模型引擎对接流程</text>
+
+  <rect x="80" y="105" width="600" height="74" rx="4" class="accent"/>
+  <text x="380" y="135" text-anchor="middle" class="label">用户配置故障预测任务</text>
+  <text x="380" y="160" text-anchor="middle" class="small">任务名称、模型、预测对象、指标、预测窗口、定时规则</text>
+  <line x1="380" y1="179" x2="380" y2="215" class="line"/>
+
+  <rect x="80" y="215" width="600" height="70" rx="4" class="box"/>
+  <text x="380" y="245" text-anchor="middle" class="label">Vue 前端通过 Axios 提交任务配置</text>
+  <text x="380" y="269" text-anchor="middle" class="mono">POST /api/ai/fault-prediction/tasks</text>
+  <line x1="380" y1="285" x2="380" y2="321" class="line"/>
+
+  <rect x="80" y="321" width="600" height="84" rx="4" class="box"/>
+  <text x="380" y="351" text-anchor="middle" class="label">Spring Boot 校验业务配置</text>
+  <text x="380" y="376" text-anchor="middle" class="small">模型启用与类型、对象存在性、指标白名单、规则合法性、权限</text>
+  <text x="380" y="396" text-anchor="middle" class="small">失败返回 400 / 403，不落库</text>
+  <line x1="380" y1="405" x2="380" y2="441" class="line"/>
+
+  <rect x="80" y="441" width="600" height="78" rx="4" class="data"/>
+  <text x="380" y="474" text-anchor="middle" class="label">保存任务配置</text>
+  <text x="380" y="500" text-anchor="middle" class="mono">ai_task · taskType = FAULT_PREDICTION</text>
+  <line x1="380" y1="519" x2="380" y2="555" class="line"/>
+
+  <rect x="80" y="555" width="600" height="70" rx="4" class="accent"/>
+  <text x="380" y="585" text-anchor="middle" class="label">用户点击立即执行或定时规则触发</text>
+  <text x="380" y="609" text-anchor="middle" class="mono">POST /api/ai/fault-prediction/tasks/{id}/execute</text>
+  <line x1="380" y1="625" x2="380" y2="661" class="line"/>
+
+  <rect x="80" y="661" width="600" height="86" rx="4" class="data"/>
+  <text x="380" y="693" text-anchor="middle" class="label">创建执行记录</text>
+  <text x="380" y="718" text-anchor="middle" class="mono">task_exec_record · PENDING</text>
+  <text x="380" y="738" text-anchor="middle" class="small">表示已受理，等待 AI 引擎；不伪造预测结果</text>
+  <line x1="380" y1="747" x2="380" y2="783" class="line"/>
+
+  <rect x="80" y="783" width="600" height="84" rx="4" class="box"/>
+  <text x="380" y="815" text-anchor="middle" class="label">AI 引擎读取任务配置和监控数据</text>
+  <text x="380" y="840" text-anchor="middle" class="small">模型服务读取 ai_task、执行上下文、指标时间范围和知识数据</text>
+  <rect x="546" y="796" width="104" height="27" rx="13" fill="#c9a35b"/><text x="598" y="815" text-anchor="middle" class="tag">后续接入点</text>
+  <line x1="380" y1="867" x2="380" y2="903" class="line"/>
+
+  <rect x="80" y="903" width="600" height="70" rx="4" class="box"/>
+  <text x="380" y="934" text-anchor="middle" class="label">执行故障预测算法</text>
+  <text x="380" y="958" text-anchor="middle" class="small">异常检测、趋势分析、风险评估、置信度计算</text>
+  <line x1="380" y1="973" x2="380" y2="1009" class="line"/>
+
+  <rect x="80" y="1009" width="600" height="84" rx="4" class="box"/>
+  <text x="380" y="1040" text-anchor="middle" class="label">回写执行状态和预测结果</text>
+  <text x="380" y="1065" text-anchor="middle" class="small">RUNNING / SUCCESS / FAILED；结果数量、结束时间、错误信息</text>
+  <text x="380" y="1085" text-anchor="middle" class="mono">未来：引擎回调或消息消费接口</text>
+  <line x1="380" y1="1093" x2="380" y2="1129" class="line"/>
+
+  <rect x="80" y="1129" width="600" height="78" rx="4" class="data"/>
+  <text x="380" y="1161" text-anchor="middle" class="label">保存故障预测结果</text>
+  <text x="380" y="1187" text-anchor="middle" class="mono">fault_report · trendJson · confidence</text>
+  <line x1="380" y1="1207" x2="380" y2="1243" class="line"/>
+
+  <rect x="80" y="1243" width="600" height="70" rx="4" class="accent"/>
+  <text x="380" y="1273" text-anchor="middle" class="label">前端展示故障智能预警</text>
+  <text x="380" y="1297" text-anchor="middle" class="mono">GET /api/ai/fault-prediction/alerts</text>
+  <line x1="380" y1="1313" x2="380" y2="1349" class="line"/>
+
+  <rect x="80" y="1349" width="600" height="48" rx="4" class="box"/>
+  <text x="380" y="1379" text-anchor="middle" class="label">用户确认、标记误报或关闭，形成处理审计</text>
+</svg>
