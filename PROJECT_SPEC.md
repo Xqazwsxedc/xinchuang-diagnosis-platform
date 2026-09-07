@@ -2556,3 +2556,12 @@ Vibe Coding 上下文维护约束：
 - 2026-08-13 完成 AI 性能优化任务配置和建议页面专用化：`/performance/task` 切换为 `OptimizationTaskConfigView.vue`，固定 `PERFORMANCE_OPTIMIZATION` 任务类型，新增模型/对象/每日每周规则抽屉、`OPT-TASK-` 服务端编码及 `PENDING` 等待优化引擎执行语义；`/performance/suggestion` 切换为 `OptimizationSuggestionView.vue`，按原型实现建议 ID、任务名称、创建者、状态筛选，多选/全选、真实 CSV 导出和居中详情处理弹窗。`opt_report` 仍为唯一建议事实表，后端补任务名称、创建者筛选、创建者批量回填和最多 100 条导出校验审计，未改变既有接口语义或数据库结构。模块说明见 `docs/modules/ai-performance-optimization/task-config.md` 与 `suggestion-management.md`。
 - 2026-08-13 性能优化任务与建议最终验证：修复通用任务更新在前端不回传内部 `taskCode` 时会触发编码必填校验的问题，更新链路改为继承原编码；新增对应白盒回归。后端 `mvn test` 82/82 通过，前端 `scripts/build-web.ps1` 通过。构建仍只有既有第三方 Rollup/Sass 和大分包提示；登录态写入、建议导出和权限黑盒待独立可写环境补验。
 - 2026-08-18 修复数据库资源详情页空状态和中等宽度错位：日志为空时不挂载 Element Plus 表格，仅显示“当前时间范围暂无服务器日志”；指标无趋势点时仅显示“暂无指标数据”，不渲染四图和缓存圆环；721-1300px 下摘要/指标卡片改为两列，日志表由内容区横向滚动承载。仅涉及前端 `DbResourceDetailView.vue` 与文档上下文，后端、数据库、部署结构不变；待 `scripts/build-web.ps1` 验证。
+# 2026-08-27 BentoML 时序异常检测第一版
+
+- 故障预测“立即执行”已从仅创建 `PENDING` 数据壳升级为可用业务闭环：事务提交后受控线程池异步原子领取任务，查询数据库资源过去 1 小时真实 Prometheus 数据，调用独立 BentoML 服务，并写入 `fault_report` 与 `SUCCESS/FAILED` 执行状态。
+- 第一版只支持 `DB_RESOURCE` 和 `CPU`、`内存`、`磁盘IO`、`数据库连接数`、`缓存命中率`。前端保留 22 项指标展示，未接入的 17 项及业务系统对象置灰并标注暂未开发；后端白名单进行最终校验。
+- 新链路使用 `input_start_time/input_end_time` 固化历史输入窗口并区分旧演示 `PENDING`；事务后事件负责即时派发，30 秒扫描恢复遗留任务，超过 5 分钟的第一版 `RUNNING` 可重新排队，条件更新避免重复领取。
+- Spring Boot 继续持有 Prometheus 地址、selector 和凭据，BentoML 只接收版本化时序 JSON。HTTP `503` 最多重试 2 次；响应校验请求 ID、契约版本、点数和异常数组。
+- Z-Score 每个指标只生成一条最强异常预警；风险等级按异常分数映射，置信度为规范化可信度估算，趋势来自真实输入。结果说明明确当前是过去 1 小时异常检测，不是未来故障预测。
+- 新增引擎映射、输入对齐、重试、原子状态和结果落库测试；定向核心测试 15/15、后端全量 `mvn verify` 111/111、Python 模型单测通过，后端 238 个源文件编译通过，前端类型检查和生产构建通过。生产训练模型、定时规则自动触发、消息队列和其余指标仍待后续。
+- 新增 `docs/tech-sharing/BentoML与AI故障预测技术介绍.md`，系统说明 BentoML 的模型服务框架定位、平台与模型职责边界、第一版端到端流程和执行状态机，并提供数据契约、关键伪代码、运行验证、企业级可靠性设计及后续生产模型升级建议；同步更新技术分享目录索引。

@@ -18,9 +18,11 @@ function Add-PathPrefix {
 function Initialize-JavaMavenEnv {
   $javaHomeInvalid = (-not $env:JAVA_HOME) -or (-not (Test-Path -LiteralPath (Join-Path $env:JAVA_HOME "bin\java.exe")))
   if ($javaHomeInvalid) {
-    $candidateJavaHome = "C:\Program Files\Java\jdk-17"
-    if (Test-Path -LiteralPath (Join-Path $candidateJavaHome "bin\java.exe")) {
-      $env:JAVA_HOME = $candidateJavaHome
+    foreach ($candidateJavaHome in @([Environment]::GetEnvironmentVariable('JAVA_HOME', 'User'), "E:\Java\jdk-17", "C:\Program Files\Java\jdk-17")) {
+      if ($candidateJavaHome -and (Test-Path -LiteralPath (Join-Path $candidateJavaHome "bin\javac.exe"))) {
+        $env:JAVA_HOME = $candidateJavaHome
+        break
+      }
     }
   }
 

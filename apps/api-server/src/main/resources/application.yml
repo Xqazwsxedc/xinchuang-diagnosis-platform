@@ -68,6 +68,8 @@ monitoring:
 
 ai:
   engine:
+    pending-scan-initial-delay-ms: ${AI_ENGINE_PENDING_SCAN_INITIAL_DELAY_MS:10000}
+    pending-scan-delay-ms: ${AI_ENGINE_PENDING_SCAN_DELAY_MS:30000}
     bentoml:
       base-url: ${AI_ENGINE_BENTOML_BASE_URL:http://127.0.0.1:3000}
       connect-timeout: ${AI_ENGINE_BENTOML_CONNECT_TIMEOUT:3s}

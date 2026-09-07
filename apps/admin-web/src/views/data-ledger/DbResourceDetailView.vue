@@ -119,31 +119,32 @@
       <template #footer><el-button @click="monitoringConfigVisible = false">取消</el-button><el-button type="primary" :loading="monitoringSaving" @click="saveMonitoring">保存配置</el-button></template>
     </el-dialog>
 
-    <el-dialog v-model="downloadVisible" title="下载指标数据" width="520px" class="metric-download-dialog" destroy-on-close>
-      <el-form label-position="top" class="download-form">
-        <el-form-item label="日期范围" required>
+    <el-dialog v-model="downloadVisible" title="下载指标数据" width="392px" class="metric-download-dialog" destroy-on-close>
+      <div class="download-form">
+        <section class="download-section">
+          <div class="download-section-label">时间范围</div>
           <div class="date-range-fields">
             <el-date-picker v-model="downloadStartDate" type="date" value-format="YYYY-MM-DD" placeholder="开始日期" :clearable="false" />
-            <span>至</span>
+            <span class="date-range-separator">–</span>
             <el-date-picker v-model="downloadEndDate" type="date" value-format="YYYY-MM-DD" placeholder="结束日期" :clearable="false" />
           </div>
           <div class="date-shortcuts">
-            <el-button v-for="shortcut in dateShortcuts" :key="shortcut.label" link type="primary" @click="applyDateShortcut(shortcut.days)">{{ shortcut.label }}</el-button>
+            <el-button v-for="shortcut in dateShortcuts" :key="shortcut.label" size="small" plain @click="applyDateShortcut(shortcut.days)">{{ shortcut.label }}</el-button>
           </div>
-        </el-form-item>
-        <el-form-item label="指标选择" required>
+        </section>
+        <section class="download-section metric-download-section">
           <div class="metric-select-toolbar">
-            <el-checkbox :model-value="allDownloadMetricsSelected" @change="toggleAllDownloadMetrics">全选</el-checkbox>
+            <el-button link type="primary" @click="selectAllDownloadMetrics">全选</el-button>
             <el-button link type="primary" @click="selectedDownloadMetrics = []">清空</el-button>
           </div>
           <el-checkbox-group v-model="selectedDownloadMetrics" class="metric-checkboxes">
             <el-checkbox v-for="item in downloadMetrics" :key="item.value" :label="item.value">{{ item.label }}</el-checkbox>
           </el-checkbox-group>
-        </el-form-item>
-      </el-form>
+        </section>
+      </div>
       <template #footer>
-        <el-button @click="downloadVisible = false">取消</el-button>
-        <el-button type="primary" :loading="downloading" :disabled="!selectedDownloadMetrics.length" @click="confirmMetricDownload">确认下载</el-button>
+        <el-button class="download-cancel-button" @click="downloadVisible = false">取消</el-button>
+        <el-button class="download-confirm-button" type="primary" :loading="downloading" :disabled="!selectedDownloadMetrics.length" @click="confirmMetricDownload">确认下载</el-button>
       </template>
     </el-dialog>
   </section>
@@ -223,8 +224,6 @@ const axisLabels = computed(() => {
   const indices = [...new Set([0, Math.floor((points.length - 1) / 3), Math.floor((points.length - 1) * 2 / 3), points.length - 1])]
   return indices.map((index) => ({ label: formatChartTime(points[index].sampledAt), x: chartX(index, points.length) }))
 })
-const allDownloadMetricsSelected = computed(() => selectedDownloadMetrics.value.length === downloadMetrics.length)
-
 async function loadPage() {
   loading.value = true
   try {
@@ -365,8 +364,8 @@ function applyDateShortcut(days: number) {
   downloadStartDate.value = formatDateInput(start)
 }
 
-function toggleAllDownloadMetrics(value: string | number | boolean) {
-  selectedDownloadMetrics.value = value ? downloadMetrics.map((item) => item.value) : []
+function selectAllDownloadMetrics() {
+  selectedDownloadMetrics.value = downloadMetrics.map((item) => item.value)
 }
 
 async function confirmMetricDownload() {
@@ -545,18 +544,117 @@ onMounted(loadPage)
 .detail-table :deep(td.el-table__cell) { height: 58px; color: #0d2450; }
 .log-pagination { display: flex; justify-content: flex-end; padding: 16px; }
 
-.download-form { padding: 4px 12px 0; }
-.download-form :deep(.el-form-item) { margin-bottom: 24px; }
-.download-form :deep(.el-form-item__label) { color: #1b2b4b; font-size: 14px; font-weight: 700; }
-.date-range-fields { display: flex; align-items: center; gap: 10px; width: 100%; }
-.date-range-fields :deep(.el-date-editor) { flex: 1; width: auto; }
-.date-shortcuts { display: flex; gap: 18px; margin-top: 10px; }
-.metric-select-toolbar { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
-.metric-checkboxes { display: flex; flex-direction: column; gap: 12px; }
-.metric-checkboxes :deep(.el-checkbox) { margin-right: 0; }
-.metric-download-dialog :deep(.el-dialog__title) { color: #102a56; font-weight: 700; }
-.metric-download-dialog :deep(.el-dialog__footer) { border-top: 1px solid #edf1f7; }
+.metric-download-dialog {
+  max-width: calc(100vw - 32px);
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+}
+.metric-download-dialog :deep(.el-dialog__header) {
+  box-sizing: border-box;
+  height: 74px;
+  margin: 0;
+  padding: 25px 22px 20px;
+  border-bottom: 1px solid #e5eaf3;
+}
+.metric-download-dialog :deep(.el-dialog__title) {
+  color: #0f1f3d;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+}
+.metric-download-dialog :deep(.el-dialog__headerbtn) {
+  top: 19px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+}
+.metric-download-dialog :deep(.el-dialog__close) {
+  color: #172033;
+  font-size: 18px;
+}
+.metric-download-dialog :deep(.el-dialog__body) { padding: 15px 22px 17px; }
+.metric-download-dialog :deep(.el-dialog__footer) {
+  padding: 20px 21px 21px;
+  border-top: 1px solid #e5eaf3;
+}
+.download-form { width: 100%; }
+.download-section + .download-section { margin-top: 20px; }
+.download-section-label {
+  margin-bottom: 10px;
+  color: #91a0ba;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 18px;
+}
+.date-range-fields { display: flex; align-items: center; gap: 7px; width: 100%; }
+.date-range-fields :deep(.el-date-editor) { flex: 1; width: 0; min-width: 0; height: 34px; }
+.date-range-fields :deep(.el-input__wrapper) {
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px #dce4f2 inset;
+}
+.date-range-fields :deep(.el-input__inner) { color: #172033; font-size: 12px; }
+.date-range-fields :deep(.el-input__prefix) { color: #91a0ba; }
+.date-range-separator { flex: none; color: #93a1b8; font-size: 13px; }
+.date-shortcuts { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.date-shortcuts :deep(.el-button) {
+  min-width: 57px;
+  height: 28px;
+  margin-left: 0;
+  padding: 0 10px;
+  border-color: #dce4f2;
+  border-radius: 10px;
+  color: #172033;
+  background: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+.date-shortcuts :deep(.el-button:hover),
+.date-shortcuts :deep(.el-button:focus) {
+  color: #3568d4;
+  border-color: #9eb9ef;
+  background: #f5f8ff;
+}
+.metric-select-toolbar { display: flex; align-items: center; gap: 12px; height: 22px; margin-bottom: 8px; }
+.metric-select-toolbar :deep(.el-button) {
+  height: auto;
+  margin-left: 0;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+.metric-select-toolbar :deep(.el-button:first-child) { color: #2256c7; }
+.metric-select-toolbar :deep(.el-button:last-child) { color: #91a0ba; }
+.metric-checkboxes { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.metric-checkboxes :deep(.el-checkbox) {
+  --el-checkbox-checked-bg-color: #34383f;
+  --el-checkbox-checked-input-border-color: #34383f;
+  --el-checkbox-checked-text-color: #172033;
+  height: 22px;
+  margin-right: 0;
+}
+.metric-checkboxes :deep(.el-checkbox__input) { height: 14px; }
+.metric-checkboxes :deep(.el-checkbox__inner) { width: 14px; height: 14px; border-radius: 2px; }
+.metric-checkboxes :deep(.el-checkbox__label) {
+  padding-left: 9px;
+  color: #172033;
+  font-size: 12px;
+  font-weight: 600;
+}
+.metric-download-dialog :deep(.download-cancel-button),
+.metric-download-dialog :deep(.download-confirm-button) {
+  height: 34px;
+  margin-left: 8px;
+  padding: 0 14px;
+  border-radius: 11px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.metric-download-dialog :deep(.download-cancel-button) { color: #26344d; border-color: #dce4f2; }
+.metric-download-dialog :deep(.download-confirm-button) { border-color: #89a9ef; background: #89a9ef; }
+.metric-download-dialog :deep(.download-confirm-button:hover),
+.metric-download-dialog :deep(.download-confirm-button:focus) { border-color: #769bea; background: #769bea; }
 
 @media (max-width: 1300px) { .db-summary, .metric-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 720px) { .db-detail-page { padding: 24px 16px 32px; }.db-summary, .metric-cards, .chart-grid { grid-template-columns: 1fr; }.panel-toolbar { align-items: flex-start; gap: 12px; flex-direction: column; }.tab-toolbar :deep(.el-button) { align-self: flex-end; } }
+@media (max-width: 720px) { .db-detail-page { padding: 24px 16px 32px; }.db-summary, .metric-cards, .chart-grid { grid-template-columns: 1fr; }.panel-toolbar { align-items: flex-start; gap: 12px; flex-direction: column; }.tab-toolbar :deep(.el-button) { align-self: flex-end; }.date-range-fields { flex-wrap: wrap; }.date-range-fields :deep(.el-date-editor) { flex-basis: calc(50% - 12px); }.date-shortcuts { gap: 6px; } }
 </style>

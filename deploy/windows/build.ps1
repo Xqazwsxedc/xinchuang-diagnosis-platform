@@ -11,7 +11,7 @@ if (Test-Path -LiteralPath $Script:SiteDir) {
 
 $maven = Get-MavenCommand
 $pnpm = Get-PnpmCommand
-$env:JAVA_HOME = 'C:\Program Files\Java\jdk-17'
+$env:JAVA_HOME = Split-Path -Parent (Split-Path -Parent (Get-JavaCommand))
 $env:MAVEN_HOME = 'E:\maven\apache-maven-3.9.16'
 $env:Path = "C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin;$env:MAVEN_HOME\bin;$env:JAVA_HOME\bin;$env:Path"
 

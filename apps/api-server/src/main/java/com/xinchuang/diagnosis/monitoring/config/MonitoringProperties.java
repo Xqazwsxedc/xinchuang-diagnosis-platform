@@ -17,6 +17,7 @@ public class MonitoringProperties {
     public Prometheus getPrometheus() { return prometheus; }
     public Targets getTargets() { return targets; }
 
+    /** Prometheus 地址、超时、认证引用和 SSRF allowlist 配置。 */
     public static class Prometheus {
         private String baseUrl = "";
         private Duration connectTimeout = Duration.ofSeconds(3);
@@ -39,6 +40,7 @@ public class MonitoringProperties {
         public void setAuthRefs(Map<String, String> value) { authRefs = value == null ? Map.of() : value; }
     }
 
+    /** 系统级 node_exporter 和 mysqld_exporter 目标标签。 */
     public static class Targets {
         private String nodeInstance = "";
         private String mysqlInstance = "";

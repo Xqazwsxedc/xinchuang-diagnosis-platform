@@ -14,6 +14,7 @@ import com.xinchuang.diagnosis.ai.dto.FaultTaskExecutionUpdateRequest;
 import com.xinchuang.diagnosis.ai.dto.FaultTaskSaveRequest;
 import com.xinchuang.diagnosis.ai.entity.AiTask;
 import com.xinchuang.diagnosis.ai.entity.TaskExecRecord;
+import com.xinchuang.diagnosis.ai.engine.FaultPredictionMetricRegistry;
 import com.xinchuang.diagnosis.ai.mapper.FaultReportMapper;
 import com.xinchuang.diagnosis.ai.mapper.TaskExecRecordMapper;
 import com.xinchuang.diagnosis.ai.service.AiManagementService;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 /**
@@ -36,10 +38,12 @@ class FaultPredictionTaskServiceImplTest {
     @Mock private AiManagementService aiManagementService;
     @Mock private TaskExecRecordMapper taskExecRecordMapper;
     @Mock private FaultReportMapper faultReportMapper;
+    @Mock private ApplicationEventPublisher eventPublisher;
     private FaultPredictionTaskServiceImpl service;
 
     @BeforeEach
-    void setUp() { service = new FaultPredictionTaskServiceImpl(aiManagementService, taskExecRecordMapper, faultReportMapper, new ObjectMapper()); }
+    void setUp() { service = new FaultPredictionTaskServiceImpl(aiManagementService, taskExecRecordMapper, faultReportMapper,
+        new ObjectMapper(), new FaultPredictionMetricRegistry(), eventPublisher); }
 
     @Test
     /** AI 引擎回调不能修改其他任务所属的执行记录。 */
@@ -107,7 +111,7 @@ class FaultPredictionTaskServiceImplTest {
     private FaultTaskExecutionUpdateRequest update(String status) { FaultTaskExecutionUpdateRequest request = new FaultTaskExecutionUpdateRequest(); request.setExecutionStatus(status); request.setStartTime(LocalDateTime.now()); return request; }
     private FaultTaskSaveRequest saveRequest() {
         FaultTaskSaveRequest request = new FaultTaskSaveRequest();
-        request.setTaskName("编辑后的任务"); request.setModelId(1L); request.setTargetType("BUSINESS_SYSTEM"); request.setTargetId(1L); request.setMetricCodes(List.of("CPU"));
+        request.setTaskName("编辑后的任务"); request.setModelId(1L); request.setTargetType("DB_RESOURCE"); request.setTargetId(1L); request.setMetricCodes(List.of("CPU"));
         FaultTaskSaveRequest.FaultTaskScheduleRule schedule = new FaultTaskSaveRequest.FaultTaskScheduleRule();
         schedule.setTime("08:00"); schedule.setRepeatType("daily"); schedule.setWeekDays(List.of()); schedule.setPredictionWindowHours(4); request.setSchedules(List.of(schedule));
         return request;

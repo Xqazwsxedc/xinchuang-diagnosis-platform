@@ -44,6 +44,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+/**
+ * 数据台账详情业务编排层。
+ *
+ * <p>这里串联资源存在性、监控配置健康状态、数据库查询、Prometheus 查询、
+ * CSV 生成和导出审计；Controller 不直接接触这些细节。</p>
+ */
 @Service
 public class LedgerDetailServiceImpl implements LedgerDetailService {
     private final BusinessSystemMapper businessSystemMapper;
@@ -81,6 +87,7 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
 
     @Override
     public List<BusinessDataRecordVO> businessDataRecords(Long businessSystemId) {
+        // 先校验父级业务系统，避免把不存在资源误显示成空列表。
         requireBusinessSystem(businessSystemId);
         return businessDataRecordMapper.selectList(new LambdaQueryWrapper<BusinessDataRecord>()
                 .eq(BusinessDataRecord::getSystemId, businessSystemId)
@@ -94,12 +101,14 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
     public DbMetricsOverviewVO dbMetrics(Long dbResourceId, DbMetricRangeQuery query) {
         DbResource resource = requireDbResource(dbResourceId);
         DbMonitoringConfig config = requireHealthyMonitoring(resource);
+        // 详情页默认一次加载五类指标，资源级 URL 和 selector 由监控配置提供。
         return loadPrometheusMetrics(config, query.getRange(), Set.of("cpuUsage", "memoryUsage", "diskIops", "currentConnections", "cacheHitRate"));
     }
 
     @Override
     public PageResponse<DbInstanceLogVO> dbLogs(Long dbResourceId, DbInstanceLogPageQuery query) {
         requireDbResource(dbResourceId);
+        // 业务日志仍来自平台自己的 db_instance_log 表，不经过 Prometheus。
         Page<DbInstanceLog> page = dbInstanceLogMapper.selectPage(new Page<>(query.getPageNo(), query.getPageSize()),
             new LambdaQueryWrapper<DbInstanceLog>()
                 .eq(DbInstanceLog::getDbInstanceId, dbResourceId)
@@ -114,6 +123,7 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
     @Transactional(rollbackFor = Exception.class)
     public LedgerDownload downloadBusinessData(Long businessSystemId, List<Long> recordIds) {
         BusinessSystem businessSystem = requireBusinessSystem(businessSystemId);
+        // 空 ID 列表表示下载全部；指定 ID 时由查询条件保证记录属于当前业务系统。
         List<BusinessDataRecord> records = recordIds == null || recordIds.isEmpty()
             ? findBusinessDataRecords(businessSystemId)
             : findBusinessDataRecords(businessSystemId, recordIds);
@@ -143,6 +153,7 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
         DbResource resource = requireDbResource(dbResourceId);
         DbMonitoringConfig config = requireHealthyMonitoring(resource);
         Set<String> metricCodes = parseMetricCodes(query.getMetrics());
+        // 自定义日期优先于页面快捷范围，否则按 range 计算最近一段时间。
         PrometheusRange selectedRange = resolveDownloadRange(query);
         if (selectedRange == null) {
             selectedRange = prometheusRangeResolver.resolve(query.getRange(), Instant.now());
@@ -168,6 +179,7 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
             if (metricCodes.contains("cacheHitRate")) csv.append(',').append(value(point.getCacheHitRate()));
             csv.append('\n');
         }
+        // 导出成功和审计记录属于同一事务，审计失败时整个导出操作回滚。
         recordExport("DB_METRICS", dbResourceId, fileName, "下载数据库指标：" + resource.getName());
         return csvDownload(fileName, csv);
     }
@@ -182,6 +194,7 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
             .eq(StringUtils.hasText(query.getLogLevel()), DbInstanceLog::getLogLevel, query.getLogLevel())
             .orderByDesc(DbInstanceLog::getLoggedAt);
         if (logIds != null && !logIds.isEmpty()) {
+            // 先按资源、时间和级别过滤，再叠加选中 ID，防止跨资源下载日志。
             wrapper.in(DbInstanceLog::getId, logIds);
         }
         List<DbInstanceLog> logs = dbInstanceLogMapper.selectList(wrapper);
@@ -237,6 +250,7 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
 
     private DbMetricsOverviewVO loadPrometheusMetrics(DbMonitoringConfig config, String range, Set<String> metricCodes) {
         try {
+            // 资源级配置允许不同数据库资源使用不同 Prometheus 地址和目标 selector。
             return prometheusMetricsService.load(prometheusRangeResolver.resolve(range, Instant.now()), metricCodes, config.getPrometheusBaseUrl(), config.getPrometheusAuthRef(),
                 selector(config.getNodeTargetSelector()), selector(config.getDatabaseTargetSelector()));
         } catch (PrometheusException exception) {
@@ -272,6 +286,7 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
         if (!StringUtils.hasText(value)) {
             throw new BusinessException("至少选择一项指标");
         }
+        // 导出接口只接受白名单指标，避免把任意字符串带入查询或 CSV 表头。
         Set<String> allowed = Set.of("cpuUsage", "memoryUsage", "cacheHitRate");
         Set<String> selected = new LinkedHashSet<>(Arrays.stream(value.split(","))
             .map(String::trim).filter(StringUtils::hasText).toList());
@@ -298,6 +313,7 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
     }
 
     private DbMonitoringConfig requireHealthyMonitoring(DbResource resource) {
+        // 只有连接测试通过且资源状态正常时，才允许读取真实监控数据。
         DbMonitoringConfig config = monitoringConfigMapper.selectOne(new LambdaQueryWrapper<DbMonitoringConfig>()
             .eq(DbMonitoringConfig::getResourceId, resource.getId()));
         if (config == null || !"HEALTHY".equals(config.getStatus()) || !"NORMAL".equals(resource.getMonitorStatus())) {
@@ -320,6 +336,7 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
     }
 
     private void recordExport(String reportType, Long reportId, String fileName, String content) {
+        // 导出操作必须关联当前登录人，同时写入导出日志和统一审计日志。
         LoginUser user = UserContext.get();
         if (user == null || user.getUserId() == null) {
             throw new BusinessException(401, "登录已失效，请重新登录");
@@ -336,6 +353,7 @@ public class LedgerDetailServiceImpl implements LedgerDetailService {
     }
 
     private LedgerDownload csvDownload(String fileName, StringBuilder csv) {
+        // UTF-8 BOM 让 Excel 等客户端正确识别中文 CSV 表头。
         return new LedgerDownload(fileName, ("\ufeff" + csv).getBytes(StandardCharsets.UTF_8));
     }
 

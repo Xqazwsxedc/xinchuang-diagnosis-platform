@@ -1,3 +1,5 @@
+"""BentoML serving contract for the deterministic time-series anomaly check."""
+
 import math
 
 import bentoml
@@ -14,6 +16,7 @@ class TimeSeriesRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_feature_lengths(self):
+        # Every feature is a parallel series aligned with the timestamp vector.
         expected = len(self.timestamps)
         if any(len(values) != expected for values in self.features.values()):
             raise ValueError("each feature must contain one value per timestamp")
@@ -46,6 +49,7 @@ class TimeSeriesAnomalyService:
     def predict(self, request: TimeSeriesRequest, /) -> TimeSeriesResponse:
         anomalies: list[AnomalyPoint] = []
         for metric_code, values in request.features.items():
+            # The communication-test model scores each point by its absolute Z-score.
             mean = sum(values) / len(values)
             variance = sum((value - mean) ** 2 for value in values) / len(values)
             standard_deviation = math.sqrt(variance)
@@ -53,6 +57,7 @@ class TimeSeriesAnomalyService:
             for index, value in enumerate(values):
                 score = 0.0 if standard_deviation == 0 else abs(value - mean) / standard_deviation
                 if score >= request.threshold:
+                    # Keep the original index and timestamp so the platform can link the alert to a sample.
                     anomalies.append(
                         AnomalyPoint(
                             metricCode=metric_code,
@@ -63,6 +68,7 @@ class TimeSeriesAnomalyService:
                         )
                     )
 
+        # Echo the contract metadata so the Java adapter can reject mismatched responses.
         return TimeSeriesResponse(
             contractVersion=request.contractVersion,
             requestId=request.requestId,

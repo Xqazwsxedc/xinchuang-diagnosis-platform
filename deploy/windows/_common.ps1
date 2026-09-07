@@ -45,9 +45,13 @@ function Initialize-DeploymentDirectories {
 }
 
 function Get-JavaCommand {
-    $knownJava = 'C:\Program Files\Java\jdk-17\bin\java.exe'
-    if (Test-Path -LiteralPath $knownJava) {
-        return $knownJava
+    foreach ($javaHome in @($env:JAVA_HOME, [Environment]::GetEnvironmentVariable('JAVA_HOME', 'User'), 'E:\Java\jdk-17', 'C:\Program Files\Java\jdk-17')) {
+        if ($javaHome) {
+            $knownJava = Join-Path $javaHome 'bin\java.exe'
+            if (Test-Path -LiteralPath $knownJava) {
+                return $knownJava
+            }
+        }
     }
     $java = Get-Command java -ErrorAction SilentlyContinue
     if ($null -eq $java) {
